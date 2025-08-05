@@ -44,8 +44,8 @@ from data import preproc as pp
 ##########################################################################################################
 ##########################################################################################################
 ##########################################################################################################
-rootPath='GAN-HTR/'
-DatabasePath='/home/ahmed/Desktop/Gan-OCR/Dataset/KHATT/'
+rootPath='./'
+DatabasePath='datasets/khatt_raw/'
 scenario='S2_khatt_OP'
 
 # define parameters
@@ -126,7 +126,7 @@ def read_file_char(list_file_path):
 		list0.append(l.strip())
 
 	return list0
-charset_base = read_file_char(rootPath+ 'src/Sets/CHAR_LIST')
+charset_base = read_file_char(rootPath+ 'Sets/CHAR_LIST')
 f=codecs.open('charlist.txt','w','utf-8')
 f.writelines(charset_base)
 f.close()
@@ -314,7 +314,7 @@ def build_discriminator_3():
 	return model	
 
 def readGrayPair(im_name):
-	deg_image_path = ('Hito-docs/DatasetKHATT1/' + im_name + '.tif')
+	deg_image_path = ('datasets/khatt_distorted/' + im_name + '.tif')
 
 	original_image = Image.open(deg_image_path)  # /255.0
 	original_image = original_image.resize((1024,128), Image.ANTIALIAS)
@@ -397,10 +397,10 @@ def train_gan(generator, discriminator_1,discriminator_2,gan,ep_start=0, epochs=
 	
 	# Build our GAN netowrks , 2 gans
 	#fc=codecs.open('histo.txt','w+','utf-8')
-	list_image_train = read_file_shuffle(rootPath + 'src/Sets/list_train')
+	list_image_train = read_file_shuffle(rootPath + 'Sets/list_train')
 	#res = list_image_train[-16:] 
 	res = list_image_train
-	list_lines = read_file(rootPath + 'src/Sets/lines.txt')
+	list_lines = read_file(rootPath + 'Sets/lines.txt')
 	for e in range(ep_start, epochs + 1):
 		batch = 0
 		print ('\n Epoch ', e)
@@ -607,10 +607,10 @@ def load(epoch):
 	
 def evaluate(epoch, generator, discriminator_1,discriminator_2,gan):
 	
-	list_image_valid = read_file(rootPath + 'src/Sets/list_valid')
+	list_image_valid = read_file(rootPath + 'Sets/list_valid')
 	#res = list_image_valid[-2:] 
 	res = list_image_valid
-	list_lines = read_file(rootPath + 'src/Sets/lines.txt')
+	list_lines = read_file(rootPath + 'Sets/lines.txt')
 	count_image=0
 	for im in res:
 		if count_image >=0:
@@ -728,7 +728,7 @@ def predict_gan(epoch, generator,list_image_valid,set):
 			#deg_image, gt_image = readGrayPairPad(im)
 			original_path_image_gt=DatabasePath + '/Gt/Images/' + im + '.tif'
 			claen_image=cv2.imread(original_path_image_gt)
-			noisy_image_path='Hito-docs/DatasetKHATT1/' + im + '.tif'
+			noisy_image_path='datasets/khatt_distorted/' + im + '.tif'
 			noisy_image=cv2.imread(noisy_image_path)
 			
 			#height, width,c = noisy_image.shape
@@ -786,7 +786,7 @@ def predict_gan_hard(epoch, generator,list_image_valid,set):
 			#deg_image, gt_image = readGrayPairPad(im)
 			original_path_image_gt=DatabasePath + '/Gt/Images/' + im + '.tif'
 			claen_image=cv2.imread(original_path_image_gt)
-			noisy_image_path='Hito-docs/DatasetKHATT1_hard3/' + im + '.tif'
+			noisy_image_path='datasets/khatt_distorted/' + im + '.tif'
 			noisy_image=cv2.imread(noisy_image_path)
 			
 			#height, width,c = noisy_image.shape
@@ -850,9 +850,9 @@ def recognition_hard(list, set,epoch,mode_crnn):
 	else:
 		path_test=rootPath + '/ResultGan' + scenario + '/hard3_set_' + set + '_epoch_' + str(epoch)+ '/prediction/'
 	
-	list_lines = read_file(rootPath + 'src/Sets/lines.txt')
+	list_lines = read_file(rootPath + 'Sets/lines.txt')
 	dtgen,model=loadCRNNModel(epoch,mode_crnn)
-	list_image_valid = read_file(rootPath + 'src/Sets/' + list)
+	list_image_valid = read_file(rootPath + 'Sets/' + list)
 	list_reco_c=[]
 	list_reco_w=[]
 	list_truth_c=[]
@@ -917,9 +917,9 @@ def recognition(list, set,epoch,mode_crnn):
 	else:
 		path_test=rootPath + '/ResultGan' + scenario + '/set_' + set + '_epoch_' + str(epoch)+ '/prediction/'
 	
-	list_lines = read_file(rootPath + 'src/Sets/lines.txt')
+	list_lines = read_file(rootPath + 'Sets/lines.txt')
 	dtgen,model=loadCRNNModel(epoch,mode_crnn)
-	list_image_valid = read_file(rootPath + 'src/Sets/' + list)
+	list_image_valid = read_file(rootPath + 'Sets/' + list)
 	list_reco_c=[]
 	list_reco_w=[]
 	list_truth_c=[]
@@ -979,14 +979,14 @@ def recognition(list, set,epoch,mode_crnn):
 	command2 = 'wer -a -e ' + path_result + 'w_truth_' + set + '.txt' + ' ' + path_result + 'w_reco_' + set + '.txt  >' + path_result + '/evaluate' + set + '_WER.txt'
 	os.system(command2)		
 def evaluateTest(epoch,list,set):
-	list_image_valid = read_file(rootPath + 'src/Sets/' + list)
+	list_image_valid = read_file(rootPath + 'Sets/' + list)
 	print('generator creation..............')
 	generator = unet()
 	generator.load_weights(rootPath+ "/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/generator_weights.h5")
 
 	predict_gan(epoch, generator,list_image_valid,set)	
 def evaluateTest_hard(epoch,list,set):
-	list_image_valid = read_file(rootPath + 'src/Sets/' + list)
+	list_image_valid = read_file(rootPath + 'Sets/' + list)
 	print('generator creation..............')
 	generator = unet()
 	scenario='S2_khatt_OP'

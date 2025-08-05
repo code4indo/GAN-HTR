@@ -19,11 +19,11 @@ f1=codecs.open('logDist.txt','a+','utf-8')
 def preprocess2(v):
     
     
-	backgrounds = os.listdir('/home/ubuntu/Sana/handwritten-text-recognition/src/backgroundIAM/')
+	backgrounds = os.listdir('datasets/background_images/')
 	ch=random.choice(backgrounds)
  
 	from PIL import Image
-	img = Image.open('/home/ubuntu/Sana/handwritten-text-recognition/src/backgroundIAM/'+ch).convert('L')
+	img = Image.open('datasets/background_images/'+ch).convert('L')
 	u=random.randint(1,4)
 	if u == 4:
 		img = img.transpose(Image.FLIP_TOP_BOTTOM)
@@ -188,10 +188,9 @@ def distort_line(image):
 def distortion(set):
 	i=0
 	#ww='/home/ubuntu/Sana/BaseIAM/DatasetIAM/distorted/'
-	#gt='/home/ubuntu/Sana/BaseIAM/DatasetIAM/GT_B/'
-	#gt='/home/ubuntu/Sana/BaseIAM/DatasetIAM/GT_B/'
-	gt='/home/ahmed/Desktop/Gan-OCR/Dataset/KHATT/Gt/Images/'
-	ww = '/home/ubuntu/Sana/Hito-docs/DatasetKHATT1_hard3/'
+	#gt='/home/ahmed/Desktop/Gan-OCR/Dataset/KHATT/Gt/Images/'
+	gt='datasets/khatt_raw/Gt/Images/'
+	ww = 'datasets/khatt_distorted/'
 	listf=read_file(set)
 	#random.shuffle(listf)
 	nbfiles=len(listf)
