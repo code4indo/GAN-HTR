@@ -2,7 +2,7 @@
 # Updated to use compatible versions for Python 3.10
 
 # Core ML libraries
-tensorflow==2.8.0
+tensorflow==2.12.0
 numpy>=1.19.0,<1.25.0
 h5py>=2.10.0,<4.0.0
 scipy>=1.7.0
