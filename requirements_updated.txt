@@ -1,0 +1,25 @@
+# Requirements for GAN-HTR Project
+# Updated to use compatible versions for Python 3.10
+
+# Core ML libraries
+tensorflow==2.8.0
+numpy>=1.19.0,<1.25.0
+h5py>=2.10.0,<4.0.0
+scipy>=1.7.0
+
+# Image processing
+opencv-python>=4.5.0
+Pillow>=8.0.0
+matplotlib>=3.3.0
+
+# Utilities
+tqdm>=4.50.0
+editdistance>=0.5.3
+
+# Additional dependencies that might be needed
+protobuf>=3.19.0,<4.22.0
+six>=1.15.0
+werkzeug>=0.16.0
+
+# Optional: If you need Keras separately
+# keras>=2.8.0
