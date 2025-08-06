@@ -72,6 +72,8 @@ werkzeug = "3.0.3"
 wrapt = "1.16.0"
 yarl = "1.9.4"
 zipp = "3.19.2"
+kagglehub = {extras = ["hf-datasets"], version = "^0.3.12"}
+datasets = "^4.0.0"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.4"

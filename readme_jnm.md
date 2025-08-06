@@ -44,7 +44,26 @@ Untuk bekerja di dalam lingkungan proyek, aktifkan *shell* yang disediakan oleh 
 ```bash
 poetry shell
 ```
-Setelah perintah ini dijalankan, prompt terminal Anda akan berubah, menandakan bahwa Anda sekarang berada di dalam virtual environment proyek. Anda dapat menjalankan perintah Python dan skrip secara langsung.
+Perintah ini akan 'memasukkan' Anda ke dalam lingkungan virtual proyek. Setelah dijalankan, prompt terminal Anda akan berubah, menandakan bahwa Anda sekarang berada di dalam virtual environment proyek. Anda dapat menjalankan perintah Python dan skrip secara langsung.
+
+**Alternatif: Menggunakan Perintah `source`**
+Jika Anda lebih suka mengaktifkan virtual environment secara manual (misalnya, untuk integrasi dengan IDE atau skrip), Anda bisa menggunakan perintah `source` dengan path ke skrip `activate` di virtual environment Poetry.
+
+1.  **Temukan path virtual environment Anda:**
+    ```bash
+    poetry env info --path
+    ```
+    Output akan menunjukkan path seperti `/home/lambda_one/.cache/pypoetry/virtualenvs/gan-htr-DgUpKV58-py3.10` (path ini bisa berbeda di sistem Anda).
+
+2.  **Aktifkan virtual environment:**
+    ```bash
+    source $(poetry env info --path)/bin/activate
+    ```
+    Atau, jika Anda sudah tahu path-nya:
+    ```bash
+    source /home/lambda_one/.cache/pypoetry/virtualenvs/gan-htr-DgUpKV58-py3.10/bin/activate
+    ```
+    Setelah diaktifkan, prompt terminal Anda juga akan berubah.
 
 **Untuk keluar dari shell, cukup ketik `exit`.**
 
@@ -194,6 +213,95 @@ watch -n 1 nvidia-smi
 | 🔍 Ingin melihat info environment | `poetry env info` akan menampilkan path ke virtual environment dan versi Python. |
 | 💥 Environment rusak | Hapus environment lama dan install ulang: `poetry env remove python && poetry install`. |
 | 📦 Menambah library baru | `poetry add <nama_package>` |
+
+---
+
+## 9. 📥 Men-download Dataset dari Kaggle
+
+Untuk mengelola dataset dari Kaggle secara efisien, Anda dapat menggunakan Kaggle API langsung dari dalam proyek ini.
+
+### 9.1. Install Library Kaggle
+Tambahkan library `kaggle` ke dalam proyek Anda menggunakan Poetry.
+```bash
+poetry add kaggle
+```
+
+### 9.2. Setup Kaggle API Key
+1.  **Buat API Token di Kaggle:**
+    - Buka situs Kaggle dan masuk ke akun Anda.
+    - Pergi ke halaman profil Anda, lalu klik **"Account"**.
+    - Gulir ke bawah hingga menemukan bagian **"API"**.
+    - Klik tombol **"Create New API Token"**. Ini akan mengunduh file `kaggle.json`.
+
+2.  **Simpan API Key:**
+    - Buat direktori `.kaggle` di folder *home* Anda jika belum ada.
+    - Pindahkan file `kaggle.json` yang baru saja diunduh ke direktori tersebut.
+
+    ```bash
+    # Buat direktori (jika belum ada)
+    mkdir -p ~/.kaggle
+
+    # Pindahkan file (ganti ~/Downloads/kaggle.json dengan path unduhan Anda)
+    mv ~/Downloads/kaggle.json ~/.kaggle/kaggle.json
+
+    # Atur izin file agar aman
+    chmod 600 ~/.kaggle/kaggle.json
+    ```
+
+### 9.3. Download Dataset
+1.  **Cari Perintah API di Halaman Dataset:**
+    - Buka halaman dataset yang ingin Anda unduh di Kaggle.
+    - Klik ikon tiga titik (menu) dan pilih **"Copy API command"**.
+
+2.  **Jalankan Perintah Download:**
+    - Gunakan `poetry run` untuk menjalankan perintah yang telah Anda salin. Contoh:
+    ```bash
+    # Contoh untuk dataset 'iam-handwriting-database'
+    poetry run kaggle datasets download -d landlord/iam-handwriting-database -p datasets/
+    ```
+    - Opsi `-p datasets/` akan mengunduh file langsung ke folder `datasets` di proyek Anda.
+
+### 9.4. Unzip Dataset
+Dataset dari Kaggle biasanya dalam format `.zip`. Anda bisa mengekstraknya menggunakan perintah `unzip`.
+
+```bash
+# Masuk ke folder datasets
+cd datasets/
+
+# Unzip file (ganti nama file sesuai dengan yang diunduh)
+unzip iam-handwriting-database.zip
+
+# (Opsional) Hapus file zip setelah diekstrak
+rm iam-handwriting-database.zip
+```
+
+---
+
+## 10. 📥 (Cara Baru) Men-download Dataset Hugging Face dari Kaggle
+
+Kaggle sekarang menyediakan cara yang lebih modern untuk men-download dataset, terutama yang terintegrasi dengan Hugging Face, menggunakan library `kagglehub`.
+
+### 10.1. Install Dependensi
+Tambahkan library `kagglehub` dengan *extra* `hf-datasets` ke proyek Anda.
+```bash
+poetry add "kagglehub[hf-datasets]"
+```
+Perintah ini akan menginstall `kagglehub` dan `datasets` dari Hugging Face.
+
+### 10.2. Buat Skrip Download
+Saya telah membuatkan skrip `download_khatt_dataset.py` untuk Anda. Skrip ini akan men-download dataset `nizarcharrada/khattarabic` dan menyimpannya di *cache* lokal (`~/.cache/kagglehub`).
+
+### 10.3. Jalankan Skrip Download
+Pastikan API key Kaggle Anda sudah ter-setup (lihat bagian 9.2), lalu jalankan skrip berikut:
+```bash
+poetry run python download_khatt_dataset.py
+```
+Skrip ini akan:
+1.  Mengunduh dataset jika belum ada di *cache*.
+2.  Me-load dataset sebagai objek `DatasetDict` dari Hugging Face.
+3.  Menampilkan struktur dataset dan beberapa contoh data.
+
+Dengan cara ini, Anda tidak perlu mengelola file `.zip` secara manual. Library `datasets` akan menangani semua proses di latar belakang.
 
 ---
 
