@@ -1,0 +1,1236 @@
+validation_0000 dilate,blur highest,2 preprocess
+validation_0001 dilate,blur highest,2 preprocess
+validation_0002 dilate,blur highest,2 preprocess
+validation_0003 dilate,blur highest,2 preprocess
+validation_0004 dilate,blur highest,2 preprocess
+validation_0005 dilate,blur highest,2 preprocess
+validation_0006 dilate,blur highest,2 preprocess
+validation_0007 dilate,blur highest,2 preprocess
+validation_0008 dilate,blur highest,2 preprocess
+validation_0009 dilate,blur highest,2 preprocess
+validation_0010 dilate,blur highest,2 preprocess
+validation_0011 dilate,blur highest,2 preprocess
+validation_0012 dilate,blur highest,2 preprocess
+validation_0013 dilate,blur highest,2 preprocess
+validation_0014 dilate,blur highest,2 preprocess
+validation_0015 dilate,blur highest,2 preprocess
+validation_0016 dilate,blur highest,2 preprocess
+validation_0017 dilate,blur highest,2 preprocess
+validation_0018 dilate,blur highest,2 preprocess
+validation_0019 dilate,blur highest,2 preprocess
+validation_0020 dilate,blur highest,2 preprocess
+validation_0021 dilate,blur highest,2 preprocess
+validation_0022 dilate,blur highest,2 preprocess
+validation_0023 dilate,blur highest,2 preprocess
+validation_0024 dilate,blur highest,2 preprocess
+validation_0025 dilate,blur highest,2 preprocess
+validation_0026 dilate,blur highest,2 preprocess
+validation_0027 dilate,blur highest,2 preprocess
+validation_0028 dilate,blur highest,2 preprocess
+validation_0029 dilate,blur highest,2 preprocess
+validation_0030 dilate,blur highest,2 preprocess
+validation_0031 dilate,blur highest,2 preprocess
+validation_0032 dilate,blur highest,2 preprocess
+validation_0033 dilate,blur highest,2 preprocess
+validation_0034 dilate,blur highest,2 preprocess
+validation_0035 dilate,blur highest,2 preprocess
+validation_0036 dilate,blur highest,2 preprocess
+validation_0037 dilate,blur highest,2 preprocess
+validation_0038 dilate,blur highest,2 preprocess
+validation_0039 dilate,blur highest,2 preprocess
+validation_0040 dilate,blur highest,2 preprocess
+validation_0041 dilate,blur highest,2 preprocess
+validation_0042 dilate,blur highest,2 preprocess
+validation_0043 dilate,blur highest,2 preprocess
+validation_0044 dilate,blur highest,2 preprocess
+validation_0045 dilate,blur highest,2 preprocess
+validation_0046 dilate,blur highest,2 preprocess
+validation_0047 dilate,blur highest,2 preprocess
+validation_0048 dilate,blur highest,2 preprocess
+validation_0049 dilate,blur highest,2 preprocess
+validation_0050 dilate,blur highest,2 preprocess
+validation_0051 dilate,blur highest,2 preprocess
+validation_0052 dilate,blur highest,2 preprocess
+validation_0053 dilate,blur highest,2 preprocess
+validation_0054 dilate,blur highest,2 preprocess
+validation_0055 dilate,blur highest,2 preprocess
+validation_0056 dilate,blur highest,2 preprocess
+validation_0057 dilate,blur highest,2 preprocess
+validation_0058 dilate,blur highest,2 preprocess
+validation_0059 dilate,blur highest,2 preprocess
+validation_0060 dilate,blur highest,2 preprocess
+validation_0061 dilate,blur highest,2 preprocess
+validation_0062 dilate,blur highest,2 preprocess
+validation_0063 dilate,blur highest,2 preprocess
+validation_0064 dilate,blur highest,2 preprocess
+validation_0065 dilate,blur highest,2 preprocess
+validation_0066 dilate,blur highest,2 preprocess
+validation_0067 dilate,blur highest,2 preprocess
+validation_0068 dilate,blur highest,2 preprocess
+validation_0069 dilate,blur highest,2 preprocess
+validation_0070 dilate,blur highest,2 preprocess
+validation_0071 dilate,blur highest,2 preprocess
+validation_0072 dilate,blur highest,2 preprocess
+validation_0073 dilate,blur highest,2 preprocess
+validation_0074 dilate,blur highest,2 preprocess
+validation_0075 dilate,blur highest,2 preprocess
+validation_0076 dilate,blur highest,2 preprocess
+validation_0077 dilate,blur highest,2 preprocess
+validation_0078 dilate,blur highest,2 preprocess
+validation_0079 dilate,blur highest,2 preprocess
+validation_0080 dilate,blur highest,2 preprocess
+validation_0081 dilate,blur highest,2 preprocess
+validation_0082 dilate,blur highest,2 preprocess
+validation_0083 dilate,blur highest,2 preprocess
+validation_0084 dilate,blur highest,2 preprocess
+validation_0085 dilate,blur highest,2 preprocess
+validation_0086 dilate,blur highest,2 preprocess
+validation_0087 dilate,blur highest,2 preprocess
+validation_0088 dilate,blur highest,2 preprocess
+validation_0089 dilate,blur highest,2 preprocess
+validation_0090 dilate,blur highest,2 preprocess
+validation_0091 dilate,blur highest,2 preprocess
+validation_0092 dilate,blur highest,2 preprocess
+validation_0093 dilate,blur highest,2 preprocess
+validation_0094 dilate,blur highest,2 preprocess
+validation_0095 dilate,blur highest,2 preprocess
+validation_0096 dilate,blur highest,2 preprocess
+validation_0097 dilate,blur highest,2 preprocess
+validation_0098 dilate,blur highest,2 preprocess
+validation_0099 dilate,blur highest,2 preprocess
+validation_0100 dilate,blur highest,2 preprocess
+validation_0101 dilate,blur highest,2 preprocess
+validation_0102 dilate,blur highest,2 preprocess
+validation_0103 dilate,blur highest,2 preprocess
+validation_0104 dilate,blur highest,2 preprocess
+validation_0105 dilate,blur highest,2 preprocess
+validation_0106 dilate,blur highest,2 preprocess
+validation_0107 dilate,blur highest,2 preprocess
+validation_0108 dilate,blur highest,2 preprocess
+validation_0109 dilate,blur highest,2 preprocess
+validation_0110 dilate,blur highest,2 preprocess
+validation_0111 dilate,blur highest,2 preprocess
+validation_0112 dilate,blur highest,2 preprocess
+validation_0113 dilate,blur highest,2 preprocess
+validation_0114 dilate,blur highest,2 preprocess
+validation_0115 dilate,blur highest,2 preprocess
+validation_0116 dilate,blur highest,2 preprocess
+validation_0117 dilate,blur highest,2 preprocess
+validation_0118 dilate,blur highest,2 preprocess
+validation_0119 dilate,blur highest,2 preprocess
+validation_0120 dilate,blur highest,2 preprocess
+validation_0121 dilate,blur highest,2 preprocess
+validation_0122 dilate,blur highest,2 preprocess
+validation_0123 dilate,blur highest,2 preprocess
+validation_0124 dilate,blur highest,2 preprocess
+validation_0125 dilate,blur highest,2 preprocess
+validation_0126 dilate,blur highest,2 preprocess
+validation_0127 dilate,blur highest,2 preprocess
+validation_0128 dilate,blur highest,2 preprocess
+validation_0129 dilate,blur highest,2 preprocess
+validation_0130 dilate,blur highest,2 preprocess
+validation_0131 dilate,blur highest,2 preprocess
+validation_0132 dilate,blur highest,2 preprocess
+validation_0133 dilate,blur highest,2 preprocess
+validation_0134 dilate,blur highest,2 preprocess
+validation_0135 dilate,blur highest,2 preprocess
+validation_0136 dilate,blur highest,2 preprocess
+validation_0137 dilate,blur highest,2 preprocess
+validation_0138 dilate,blur highest,2 preprocess
+validation_0139 dilate,blur highest,2 preprocess
+validation_0140 dilate,blur highest,2 preprocess
+validation_0141 dilate,blur highest,2 preprocess
+validation_0142 dilate,blur highest,2 preprocess
+validation_0143 dilate,blur highest,2 preprocess
+validation_0144 dilate,blur highest,2 preprocess
+validation_0145 dilate,blur highest,2 preprocess
+validation_0146 dilate,blur highest,2 preprocess
+validation_0147 dilate,blur highest,2 preprocess
+validation_0148 dilate,blur highest,2 preprocess
+validation_0149 dilate,blur highest,2 preprocess
+validation_0150 dilate,blur highest,2 preprocess
+validation_0151 dilate,blur highest,2 preprocess
+validation_0152 dilate,blur highest,2 preprocess
+validation_0153 dilate,blur highest,2 preprocess
+validation_0154 dilate,blur highest,2 preprocess
+validation_0155 dilate,blur highest,2 preprocess
+validation_0156 dilate,blur highest,2 preprocess
+validation_0157 dilate,blur highest,2 preprocess
+validation_0158 dilate,blur highest,2 preprocess
+validation_0159 dilate,blur highest,2 preprocess
+validation_0160 dilate,blur highest,2 preprocess
+validation_0161 dilate,blur highest,2 preprocess
+validation_0162 dilate,blur highest,2 preprocess
+validation_0163 dilate,blur highest,2 preprocess
+validation_0164 dilate,blur highest,2 preprocess
+validation_0165 dilate,blur highest,2 preprocess
+validation_0166 dilate,blur highest,2 preprocess
+validation_0167 dilate,blur highest,2 preprocess
+validation_0168 dilate,blur highest,2 preprocess
+validation_0169 dilate,blur highest,2 preprocess
+validation_0170 dilate,blur highest,2 preprocess
+validation_0171 dilate,blur highest,2 preprocess
+validation_0172 dilate,blur highest,2 preprocess
+validation_0173 dilate,blur highest,2 preprocess
+validation_0174 dilate,blur highest,2 preprocess
+validation_0175 dilate,blur highest,2 preprocess
+validation_0176 dilate,blur highest,2 preprocess
+validation_0177 dilate,blur highest,2 preprocess
+validation_0178 dilate,blur highest,2 preprocess
+validation_0179 dilate,blur highest,2 preprocess
+validation_0180 dilate,blur highest,2 preprocess
+validation_0181 dilate,blur highest,2 preprocess
+validation_0182 dilate,blur highest,2 preprocess
+validation_0183 dilate,blur highest,2 preprocess
+validation_0184 dilate,blur highest,2 preprocess
+validation_0185 dilate,blur highest,2 preprocess
+validation_0186 dilate,blur highest,2 preprocess
+validation_0187 dilate,blur highest,2 preprocess
+validation_0188 dilate,blur highest,2 preprocess
+validation_0189 dilate,blur highest,2 preprocess
+validation_0190 dilate,blur highest,2 preprocess
+validation_0191 dilate,blur highest,2 preprocess
+validation_0192 dilate,blur highest,2 preprocess
+validation_0193 dilate,blur highest,2 preprocess
+validation_0194 dilate,blur highest,2 preprocess
+validation_0195 dilate,blur highest,2 preprocess
+validation_0196 dilate,blur highest,2 preprocess
+validation_0197 dilate,blur highest,2 preprocess
+validation_0198 dilate,blur highest,2 preprocess
+validation_0199 dilate,blur highest,2 preprocess
+validation_0200 dilate,blur highest,2 preprocess
+validation_0201 dilate,blur highest,2 preprocess
+validation_0202 dilate,blur highest,2 preprocess
+validation_0203 dilate,blur highest,2 preprocess
+validation_0204 dilate,blur highest,2 preprocess
+validation_0205 dilate,blur highest,2 preprocess
+validation_0206 dilate,blur highest,2 preprocess
+validation_0207 dilate,blur highest,2 preprocess
+validation_0208 dilate,blur highest,2 preprocess
+validation_0209 dilate,blur highest,2 preprocess
+validation_0210 dilate,blur highest,2 preprocess
+validation_0211 dilate,blur highest,2 preprocess
+validation_0212 dilate,blur highest,2 preprocess
+validation_0213 dilate,blur highest,2 preprocess
+validation_0214 dilate,blur highest,2 preprocess
+validation_0215 dilate,blur highest,2 preprocess
+validation_0216 dilate,blur highest,2 preprocess
+validation_0217 dilate,blur highest,2 preprocess
+validation_0218 dilate,blur highest,2 preprocess
+validation_0219 dilate,blur highest,2 preprocess
+validation_0220 dilate,blur highest,2 preprocess
+validation_0221 dilate,blur highest,2 preprocess
+validation_0222 dilate,blur highest,2 preprocess
+validation_0223 dilate,blur highest,2 preprocess
+validation_0224 dilate,blur highest,2 preprocess
+validation_0225 dilate,blur highest,2 preprocess
+validation_0226 dilate,blur highest,2 preprocess
+validation_0227 dilate,blur highest,2 preprocess
+validation_0228 dilate,blur highest,2 preprocess
+validation_0229 dilate,blur highest,2 preprocess
+validation_0230 dilate,blur highest,2 preprocess
+validation_0231 dilate,blur highest,2 preprocess
+validation_0232 dilate,blur highest,2 preprocess
+validation_0233 dilate,blur highest,2 preprocess
+validation_0234 dilate,blur highest,2 preprocess
+validation_0235 dilate,blur highest,2 preprocess
+validation_0236 dilate,blur highest,2 preprocess
+validation_0237 dilate,blur highest,2 preprocess
+validation_0238 dilate,blur highest,2 preprocess
+validation_0239 dilate,blur highest,2 preprocess
+validation_0240 dilate,blur highest,2 preprocess
+validation_0241 dilate,blur highest,2 preprocess
+validation_0242 dilate,blur highest,2 preprocess
+validation_0243 dilate,blur highest,2 preprocess
+validation_0244 dilate, preprocess
+validation_0245 dilate, preprocess
+validation_0246 dilate, preprocess
+validation_0247 dilate, preprocess
+validation_0248 dilate, preprocess
+validation_0249 dilate, preprocess
+validation_0250 dilate, preprocess
+validation_0251 dilate, preprocess
+validation_0252 dilate, preprocess
+validation_0253 dilate, preprocess
+validation_0254 dilate, preprocess
+validation_0255 dilate, preprocess
+validation_0256 dilate, preprocess
+validation_0257 dilate, preprocess
+validation_0258 dilate, preprocess
+validation_0259 dilate, preprocess
+validation_0260 dilate, preprocess
+validation_0261 dilate, preprocess
+validation_0262 dilate, preprocess
+validation_0263 dilate, preprocess
+validation_0264 dilate, preprocess
+validation_0265 dilate, preprocess
+validation_0266 dilate, preprocess
+validation_0267 dilate, preprocess
+validation_0268 dilate, preprocess
+validation_0269 dilate, preprocess
+validation_0270 dilate, preprocess
+validation_0271 dilate, preprocess
+validation_0272 dilate, preprocess
+validation_0273 dilate, preprocess
+validation_0274 dilate, preprocess
+validation_0275 dilate, preprocess
+validation_0276 dilate, preprocess
+validation_0277 dilate, preprocess
+validation_0278 dilate, preprocess
+validation_0279 dilate, preprocess
+validation_0280 dilate, preprocess
+validation_0281 dilate, preprocess
+validation_0282 dilate, preprocess
+validation_0283 dilate, preprocess
+validation_0284 dilate, preprocess
+validation_0285 dilate, preprocess
+validation_0286 dilate, preprocess
+validation_0287 dilate, preprocess
+validation_0288 dilate, preprocess
+validation_0289 dilate, preprocess
+validation_0290 dilate, preprocess
+validation_0291 dilate, preprocess
+validation_0292 dilate, preprocess
+validation_0293 dilate, preprocess
+validation_0294 dilate, preprocess
+validation_0295 dilate, preprocess
+validation_0296 dilate, preprocess
+validation_0297 dilate, preprocess
+validation_0298 dilate, preprocess
+validation_0299 dilate, preprocess
+validation_0300 dilate, preprocess
+validation_0301 dilate, preprocess
+validation_0302 dilate, preprocess
+validation_0303 dilate, preprocess
+validation_0304 dilate, preprocess
+validation_0305 dilate, preprocess
+validation_0306 dilate, preprocess
+validation_0307 dilate, preprocess
+validation_0308 dilate, preprocess
+validation_0309 dilate, preprocess
+validation_0310 dilate, preprocess
+validation_0311 dilate, preprocess
+validation_0312 dilate, preprocess
+validation_0313 dilate, preprocess
+validation_0314 dilate, preprocess
+validation_0315 dilate, preprocess
+validation_0316 dilate, preprocess
+validation_0317 dilate, preprocess
+validation_0318 dilate, preprocess
+validation_0319 dilate, preprocess
+validation_0320 dilate, preprocess
+validation_0321 dilate, preprocess
+validation_0322 dilate, preprocess
+validation_0323 dilate, preprocess
+validation_0324 dilate, preprocess
+validation_0325 dilate, preprocess
+validation_0326 dilate, preprocess
+validation_0327 dilate, preprocess
+validation_0328 dilate, preprocess
+validation_0329 dilate, preprocess
+validation_0330 dilate, preprocess
+validation_0331 dilate, preprocess
+validation_0332 dilate, preprocess
+validation_0333 dilate, preprocess
+validation_0334 dilate, preprocess
+validation_0335 dilate, preprocess
+validation_0336 dilate, preprocess
+validation_0337 dilate, preprocess
+validation_0338 dilate, preprocess
+validation_0339 dilate, preprocess
+validation_0340 dilate, preprocess
+validation_0341 dilate, preprocess
+validation_0342 dilate, preprocess
+validation_0343 dilate, preprocess
+validation_0344 dilate, preprocess
+validation_0345 dilate, preprocess
+validation_0346 dilate, preprocess
+validation_0347 dilate, preprocess
+validation_0348 dilate, preprocess
+validation_0349 dilate, preprocess
+validation_0350 dilate, preprocess
+validation_0351 dilate, preprocess
+validation_0352 dilate, preprocess
+validation_0353 dilate, preprocess
+validation_0354 dilate, preprocess
+validation_0355 dilate, preprocess
+validation_0356 dilate, preprocess
+validation_0357 dilate, preprocess
+validation_0358 dilate, preprocess
+validation_0359 dilate, preprocess
+validation_0360 dilate, preprocess
+validation_0361 dilate, preprocess
+validation_0362 dilate, preprocess
+validation_0363 dilate, preprocess
+validation_0364 dilate, preprocess
+validation_0365 dilate, preprocess
+validation_0366 dilate preprocess
+validation_0367 dilate preprocess
+validation_0368 dilate preprocess
+validation_0369 dilate preprocess
+validation_0370 dilate preprocess
+validation_0371 dilate preprocess
+validation_0372 dilate preprocess
+validation_0373 dilate preprocess
+validation_0374 dilate preprocess
+validation_0375 dilate preprocess
+validation_0376 dilate preprocess
+validation_0377 dilate preprocess
+validation_0378 dilate preprocess
+validation_0379 dilate preprocess
+validation_0380 dilate preprocess
+validation_0381 dilate preprocess
+validation_0382 dilate preprocess
+validation_0383 dilate preprocess
+validation_0384 dilate preprocess
+validation_0385 dilate preprocess
+validation_0386 dilate preprocess
+validation_0387 dilate preprocess
+validation_0388 dilate preprocess
+validation_0389 dilate preprocess
+validation_0390 dilate preprocess
+validation_0391 dilate preprocess
+validation_0392 dilate preprocess
+validation_0393 dilate preprocess
+validation_0394 dilate preprocess
+validation_0395 dilate preprocess
+validation_0396 dilate preprocess
+validation_0397 dilate preprocess
+validation_0398 dilate preprocess
+validation_0399 dilate preprocess
+validation_0400 dilate preprocess
+validation_0401 dilate preprocess
+validation_0402 dilate preprocess
+validation_0403 dilate preprocess
+validation_0404 dilate preprocess
+validation_0405 dilate preprocess
+validation_0406 dilate preprocess
+validation_0407 dilate preprocess
+validation_0408 dilate preprocess
+validation_0409 dilate preprocess
+validation_0410 dilate preprocess
+validation_0411 dilate preprocess
+validation_0412 dilate preprocess
+validation_0413 dilate preprocess
+validation_0414 dilate preprocess
+validation_0415 dilate preprocess
+validation_0416 dilate preprocess
+validation_0417 dilate preprocess
+validation_0418 dilate preprocess
+validation_0419 dilate preprocess
+validation_0420 dilate preprocess
+validation_0421 dilate preprocess
+validation_0422 dilate preprocess
+validation_0423 dilate preprocess
+validation_0424 dilate preprocess
+validation_0425 dilate preprocess
+validation_0426 dilate preprocess
+validation_0427 dilate preprocess
+validation_0428 dilate preprocess
+validation_0429 dilate preprocess
+validation_0430 dilate preprocess
+validation_0431 dilate preprocess
+validation_0432 dilate preprocess
+validation_0433 dilate preprocess
+validation_0434 dilate preprocess
+validation_0435 dilate preprocess
+validation_0436 dilate preprocess
+validation_0437 dilate preprocess
+validation_0438 dilate preprocess
+validation_0439 dilate preprocess
+validation_0440 dilate preprocess
+validation_0441 dilate preprocess
+validation_0442 dilate preprocess
+validation_0443 dilate preprocess
+validation_0444 dilate preprocess
+validation_0445 dilate preprocess
+validation_0446 dilate preprocess
+validation_0447 dilate preprocess
+validation_0448 dilate preprocess
+validation_0449 dilate preprocess
+validation_0450 dilate preprocess
+validation_0451 dilate preprocess
+validation_0452 dilate preprocess
+validation_0453 dilate preprocess
+validation_0454 dilate preprocess
+validation_0455 dilate preprocess
+validation_0456 dilate preprocess
+validation_0457 dilate preprocess
+validation_0458 dilate preprocess
+validation_0459 dilate preprocess
+validation_0460 dilate preprocess
+validation_0461 dilate preprocess
+validation_0462 dilate preprocess
+validation_0463 dilate preprocess
+validation_0464 dilate preprocess
+validation_0465 dilate preprocess
+validation_0466 dilate preprocess
+validation_0467 dilate preprocess
+validation_0468 dilate preprocess
+validation_0469 dilate preprocess
+validation_0470 dilate preprocess
+validation_0471 dilate preprocess
+validation_0472 dilate preprocess
+validation_0473 dilate preprocess
+validation_0474 dilate preprocess
+validation_0475 dilate preprocess
+validation_0476 dilate preprocess
+validation_0477 dilate preprocess
+validation_0478 dilate preprocess
+validation_0479 dilate preprocess
+validation_0480 dilate preprocess
+validation_0481 dilate preprocess
+validation_0482 dilate preprocess
+validation_0483 dilate preprocess
+validation_0484 dilate preprocess
+validation_0485 dilate preprocess
+validation_0486 dilate preprocess
+validation_0487 dilate preprocess
+validation_0488 dilate,blur highest,preprocess
+validation_0489 dilate,blur highest,preprocess
+validation_0490 dilate,blur highest,preprocess
+validation_0491 dilate,blur highest,preprocess
+validation_0492 dilate,blur highest,preprocess
+validation_0493 dilate,blur highest,preprocess
+validation_0494 dilate,blur highest,preprocess
+validation_0495 dilate,blur highest,preprocess
+validation_0496 dilate,blur highest,preprocess
+validation_0497 dilate,blur highest,preprocess
+validation_0498 dilate,blur highest,preprocess
+validation_0499 dilate,blur highest,preprocess
+validation_0500 dilate,blur highest,preprocess
+validation_0501 dilate,blur highest,preprocess
+validation_0502 dilate,blur highest,preprocess
+validation_0503 dilate,blur highest,preprocess
+validation_0504 dilate,blur highest,preprocess
+validation_0505 dilate,blur highest,preprocess
+validation_0506 dilate,blur highest,preprocess
+validation_0507 dilate,blur highest,preprocess
+validation_0508 dilate,blur highest,preprocess
+validation_0509 dilate,blur highest,preprocess
+validation_0510 dilate,blur highest,preprocess
+validation_0511 dilate,blur highest,preprocess
+validation_0512 dilate,blur highest,preprocess
+validation_0513 dilate,blur highest,preprocess
+validation_0514 dilate,blur highest,preprocess
+validation_0515 dilate,blur highest,preprocess
+validation_0516 dilate,blur highest,preprocess
+validation_0517 dilate,blur highest,preprocess
+validation_0518 dilate,blur highest,preprocess
+validation_0519 dilate,blur highest,preprocess
+validation_0520 dilate,blur highest,preprocess
+validation_0521 dilate,blur highest,preprocess
+validation_0522 dilate,blur highest,preprocess
+validation_0523 dilate,blur highest,preprocess
+validation_0524 dilate,blur highest,preprocess
+validation_0525 dilate,blur highest,preprocess
+validation_0526 dilate,blur highest,preprocess
+validation_0527 dilate,blur highest,preprocess
+validation_0528 dilate,blur highest,preprocess
+validation_0529 dilate,blur highest,preprocess
+validation_0530 dilate,blur highest,preprocess
+validation_0531 dilate,blur highest,preprocess
+validation_0532 dilate,blur highest,preprocess
+validation_0533 dilate,blur highest,preprocess
+validation_0534 dilate,blur highest,preprocess
+validation_0535 dilate,blur highest,preprocess
+validation_0536 dilate,blur highest,preprocess
+validation_0537 dilate,blur highest,preprocess
+validation_0538 dilate,blur highest,preprocess
+validation_0539 dilate,blur highest,preprocess
+validation_0540 dilate,blur highest,preprocess
+validation_0541 dilate,blur highest,preprocess
+validation_0542 dilate,blur highest,preprocess
+validation_0543 dilate,blur highest,preprocess
+validation_0544 dilate,blur highest,preprocess
+validation_0545 dilate,blur highest,preprocess
+validation_0546 dilate,blur highest,preprocess
+validation_0547 dilate,blur highest,preprocess
+validation_0548 dilate,blur highest,preprocess
+validation_0549 dilate,blur highest,preprocess
+validation_0550 dilate,blur highest,preprocess
+validation_0551 dilate,blur highest,preprocess
+validation_0552 dilate,blur highest,preprocess
+validation_0553 dilate,blur highest,preprocess
+validation_0554 dilate,blur highest,preprocess
+validation_0555 dilate,blur highest,preprocess
+validation_0556 dilate,blur highest,preprocess
+validation_0557 dilate,blur highest,preprocess
+validation_0558 dilate,blur highest,preprocess
+validation_0559 dilate,blur highest,preprocess
+validation_0560 dilate,blur highest,preprocess
+validation_0561 dilate,blur highest,preprocess
+validation_0562 dilate,blur highest,preprocess
+validation_0563 dilate,blur highest,preprocess
+validation_0564 dilate,blur highest,preprocess
+validation_0565 dilate,blur highest,preprocess
+validation_0566 dilate,blur highest,preprocess
+validation_0567 dilate,blur highest,preprocess
+validation_0568 dilate,blur highest,preprocess
+validation_0569 dilate,blur highest,preprocess
+validation_0570 dilate,blur highest,preprocess
+validation_0571 dilate,blur highest,preprocess
+validation_0572 dilate,blur highest,preprocess
+validation_0573 dilate,blur highest,preprocess
+validation_0574 dilate,blur highest,preprocess
+validation_0575 dilate,blur highest,preprocess
+validation_0576 dilate,blur highest,preprocess
+validation_0577 dilate,blur highest,preprocess
+validation_0578 dilate,blur highest,preprocess
+validation_0579 dilate,blur highest,preprocess
+validation_0580 dilate,blur highest,preprocess
+validation_0581 dilate,blur highest,preprocess
+validation_0582 dilate,blur highest,preprocess
+validation_0583 dilate,blur highest,preprocess
+validation_0584 dilate,blur highest,preprocess
+validation_0585 dilate,blur highest,preprocess
+validation_0586 dilate,blur highest,preprocess
+validation_0587 dilate,blur highest,preprocess
+validation_0588 dilate,blur highest,preprocess
+validation_0589 dilate,blur highest,preprocess
+validation_0590 dilate,blur highest,preprocess
+validation_0591 dilate,blur highest,preprocess
+validation_0592 dilate,blur highest,preprocess
+validation_0593 dilate,blur highest,preprocess
+validation_0594 dilate,blur highest,preprocess
+validation_0595 dilate,blur highest,preprocess
+validation_0596 dilate,blur highest,preprocess
+validation_0597 dilate,blur highest,preprocess
+validation_0598 dilate,blur highest,preprocess
+validation_0599 dilate,blur highest,preprocess
+validation_0600 dilate,blur highest,preprocess
+validation_0601 dilate,blur highest,preprocess
+validation_0602 dilate,blur highest,preprocess
+validation_0603 dilate,blur highest,preprocess
+validation_0604 dilate,blur highest,preprocess
+validation_0605 dilate,blur highest,preprocess
+validation_0606 dilate,blur highest,preprocess
+validation_0607 dilate,blur highest,preprocess
+validation_0608 dilate,blur highest,preprocess
+validation_0609 dilate,blur highest,preprocess
+validation_0610 erode,blur low,line, preprocess
+validation_0611 erode,blur low,line, preprocess
+validation_0612 erode,blur low,line, preprocess
+validation_0613 erode,blur low,line, preprocess
+validation_0614 erode,blur low,line, preprocess
+validation_0615 erode,blur low,line, preprocess
+validation_0616 erode,blur low,line, preprocess
+validation_0617 erode,blur low,line, preprocess
+validation_0618 erode,blur low,line, preprocess
+validation_0619 erode,blur low,line, preprocess
+validation_0620 erode,blur low,line, preprocess
+validation_0621 erode,blur low,line, preprocess
+validation_0622 erode,blur low,line, preprocess
+validation_0623 erode,blur low,line, preprocess
+validation_0624 erode,blur low,line, preprocess
+validation_0625 erode,blur low,line, preprocess
+validation_0626 erode,blur low,line, preprocess
+validation_0627 erode,blur low,line, preprocess
+validation_0628 erode,blur low,line, preprocess
+validation_0629 erode,blur low,line, preprocess
+validation_0630 erode,blur low,line, preprocess
+validation_0631 erode,blur low,line, preprocess
+validation_0632 erode,blur low,line, preprocess
+validation_0633 erode,blur low,line, preprocess
+validation_0634 erode,blur low,line, preprocess
+validation_0635 erode,blur low,line, preprocess
+validation_0636 erode,blur low,line, preprocess
+validation_0637 erode,blur low,line, preprocess
+validation_0638 erode,blur low,line, preprocess
+validation_0639 erode,blur low,line, preprocess
+validation_0640 erode,blur low,line, preprocess
+validation_0641 erode,blur low,line, preprocess
+validation_0642 erode,blur low,line, preprocess
+validation_0643 erode,blur low,line, preprocess
+validation_0644 erode,blur low,line, preprocess
+validation_0645 erode,blur low,line, preprocess
+validation_0646 erode,blur low,line, preprocess
+validation_0647 erode,blur low,line, preprocess
+validation_0648 erode,blur low,line, preprocess
+validation_0649 erode,blur low,line, preprocess
+validation_0650 erode,blur low,line, preprocess
+validation_0651 erode,blur low,line, preprocess
+validation_0652 erode,blur low,line, preprocess
+validation_0653 erode,blur low,line, preprocess
+validation_0654 erode,blur low,line, preprocess
+validation_0655 erode,blur low,line, preprocess
+validation_0656 erode,blur low,line, preprocess
+validation_0657 erode,blur low,line, preprocess
+validation_0658 erode,blur low,line, preprocess
+validation_0659 erode,blur low,line, preprocess
+validation_0660 erode,blur low,line, preprocess
+validation_0661 erode,blur low,line, preprocess
+validation_0662 erode,blur low,line, preprocess
+validation_0663 erode,blur low,line, preprocess
+validation_0664 erode,blur low,line, preprocess
+validation_0665 erode,blur low,line, preprocess
+validation_0666 erode,blur low,line, preprocess
+validation_0667 erode,blur low,line, preprocess
+validation_0668 erode,blur low,line, preprocess
+validation_0669 erode,blur low,line, preprocess
+validation_0670 erode,blur low,line, preprocess
+validation_0671 erode,blur low,line, preprocess
+validation_0672 erode,blur low,line, preprocess
+validation_0673 erode,blur low,line, preprocess
+validation_0674 erode,blur low,line, preprocess
+validation_0675 erode,blur low,line, preprocess
+validation_0676 erode,blur low,line, preprocess
+validation_0677 erode,blur low,line, preprocess
+validation_0678 erode,blur low,line, preprocess
+validation_0679 erode,blur low,line, preprocess
+validation_0680 erode,blur low,line, preprocess
+validation_0681 erode,blur low,line, preprocess
+validation_0682 erode,blur low,line, preprocess
+validation_0683 erode,blur low,line, preprocess
+validation_0684 erode,blur low,line, preprocess
+validation_0685 erode,blur low,line, preprocess
+validation_0686 erode,blur low,line, preprocess
+validation_0687 erode,blur low,line, preprocess
+validation_0688 erode,blur low,line, preprocess
+validation_0689 erode,blur low,line, preprocess
+validation_0690 erode,blur low,line, preprocess
+validation_0691 erode,blur low,line, preprocess
+validation_0692 erode,blur low,line, preprocess
+validation_0693 erode,blur low,line, preprocess
+validation_0694 erode,blur low,line, preprocess
+validation_0695 erode,blur low,line, preprocess
+validation_0696 erode,blur low,line, preprocess
+validation_0697 erode,blur low,line, preprocess
+validation_0698 erode,blur low,line, preprocess
+validation_0699 erode,blur low,line, preprocess
+validation_0700 erode,blur low,line, preprocess
+validation_0701 erode,blur low,line, preprocess
+validation_0702 erode,blur low,line, preprocess
+validation_0703 erode,blur low,line, preprocess
+validation_0704 erode,blur low,line, preprocess
+validation_0705 erode,blur low,line, preprocess
+validation_0706 erode,blur low,line, preprocess
+validation_0707 erode,blur low,line, preprocess
+validation_0708 erode,blur low,line, preprocess
+validation_0709 erode,blur low,line, preprocess
+validation_0710 erode,blur low,line, preprocess
+validation_0711 erode,blur low,line, preprocess
+validation_0712 erode,blur low,line, preprocess
+validation_0713 erode,blur low,line, preprocess
+validation_0714 erode,blur low,line, preprocess
+validation_0715 erode,blur low,line, preprocess
+validation_0716 erode,blur low,line, preprocess
+validation_0717 erode,blur low,line, preprocess
+validation_0718 erode,blur low,line, preprocess
+validation_0719 erode,blur low,line, preprocess
+validation_0720 erode,blur low,line, preprocess
+validation_0721 erode,blur low,line, preprocess
+validation_0722 erode,blur low,line, preprocess
+validation_0723 erode,blur low,line, preprocess
+validation_0724 erode,blur low,line, preprocess
+validation_0725 erode,blur low,line, preprocess
+validation_0726 erode,blur low,line, preprocess
+validation_0727 erode,blur low,line, preprocess
+validation_0728 erode,blur low,line, preprocess
+validation_0729 erode,blur low,line, preprocess
+validation_0730 erode,blur low,line, preprocess
+validation_0731 erode,blur low,line, preprocess
+validation_0732 erode, preprocess
+validation_0733 erode, preprocess
+validation_0734 erode, preprocess
+validation_0735 erode, preprocess
+validation_0736 erode, preprocess
+validation_0737 erode, preprocess
+validation_0738 erode, preprocess
+validation_0739 erode, preprocess
+validation_0740 erode, preprocess
+validation_0741 erode, preprocess
+validation_0742 erode, preprocess
+validation_0743 erode, preprocess
+validation_0744 erode, preprocess
+validation_0745 erode, preprocess
+validation_0746 erode, preprocess
+validation_0747 erode, preprocess
+validation_0748 erode, preprocess
+validation_0749 erode, preprocess
+validation_0750 erode, preprocess
+validation_0751 erode, preprocess
+validation_0752 erode, preprocess
+validation_0753 erode, preprocess
+validation_0754 erode, preprocess
+validation_0755 erode, preprocess
+validation_0756 erode, preprocess
+validation_0757 erode, preprocess
+validation_0758 erode, preprocess
+validation_0759 erode, preprocess
+validation_0760 erode, preprocess
+validation_0761 erode, preprocess
+validation_0762 erode, preprocess
+validation_0763 erode, preprocess
+validation_0764 erode, preprocess
+validation_0765 erode, preprocess
+validation_0766 erode, preprocess
+validation_0767 erode, preprocess
+validation_0768 erode, preprocess
+validation_0769 erode, preprocess
+validation_0770 erode, preprocess
+validation_0771 erode, preprocess
+validation_0772 erode, preprocess
+validation_0773 erode, preprocess
+validation_0774 erode, preprocess
+validation_0775 erode, preprocess
+validation_0776 erode, preprocess
+validation_0777 erode, preprocess
+validation_0778 erode, preprocess
+validation_0779 erode, preprocess
+validation_0780 erode, preprocess
+validation_0781 erode, preprocess
+validation_0782 erode, preprocess
+validation_0783 erode, preprocess
+validation_0784 erode, preprocess
+validation_0785 erode, preprocess
+validation_0786 erode, preprocess
+validation_0787 erode, preprocess
+validation_0788 erode, preprocess
+validation_0789 erode, preprocess
+validation_0790 erode, preprocess
+validation_0791 erode, preprocess
+validation_0792 erode, preprocess
+validation_0793 erode, preprocess
+validation_0794 erode, preprocess
+validation_0795 erode, preprocess
+validation_0796 erode, preprocess
+validation_0797 erode, preprocess
+validation_0798 erode, preprocess
+validation_0799 erode, preprocess
+validation_0800 erode, preprocess
+validation_0801 erode, preprocess
+validation_0802 erode, preprocess
+validation_0803 erode, preprocess
+validation_0804 erode, preprocess
+validation_0805 erode, preprocess
+validation_0806 erode, preprocess
+validation_0807 erode, preprocess
+validation_0808 erode, preprocess
+validation_0809 erode, preprocess
+validation_0810 erode, preprocess
+validation_0811 erode, preprocess
+validation_0812 erode, preprocess
+validation_0813 erode, preprocess
+validation_0814 erode, preprocess
+validation_0815 erode, preprocess
+validation_0816 erode, preprocess
+validation_0817 erode, preprocess
+validation_0818 erode, preprocess
+validation_0819 erode, preprocess
+validation_0820 erode, preprocess
+validation_0821 erode, preprocess
+validation_0822 erode, preprocess
+validation_0823 erode, preprocess
+validation_0824 erode, preprocess
+validation_0825 erode, preprocess
+validation_0826 erode, preprocess
+validation_0827 erode, preprocess
+validation_0828 erode, preprocess
+validation_0829 erode, preprocess
+validation_0830 erode, preprocess
+validation_0831 erode, preprocess
+validation_0832 erode, preprocess
+validation_0833 erode, preprocess
+validation_0834 erode, preprocess
+validation_0835 erode, preprocess
+validation_0836 erode, preprocess
+validation_0837 erode, preprocess
+validation_0838 erode, preprocess
+validation_0839 erode, preprocess
+validation_0840 erode, preprocess
+validation_0841 erode, preprocess
+validation_0842 erode, preprocess
+validation_0843 erode, preprocess
+validation_0844 erode, preprocess
+validation_0845 erode, preprocess
+validation_0846 erode, preprocess
+validation_0847 erode, preprocess
+validation_0848 erode, preprocess
+validation_0849 erode, preprocess
+validation_0850 erode, preprocess
+validation_0851 erode, preprocess
+validation_0852 erode, preprocess
+validation_0853 erode, preprocess
+validation_0854 dilate,blur highest,2 preprocess
+validation_0855 dilate,blur highest,2 preprocess
+validation_0856 dilate,blur highest,2 preprocess
+validation_0857 dilate,blur highest,2 preprocess
+validation_0858 dilate,blur highest,2 preprocess
+validation_0859 dilate,blur highest,2 preprocess
+validation_0860 dilate,blur highest,2 preprocess
+validation_0861 dilate,blur highest,2 preprocess
+validation_0862 dilate,blur highest,2 preprocess
+validation_0863 dilate,blur highest,2 preprocess
+validation_0864 dilate,blur highest,2 preprocess
+validation_0865 dilate,blur highest,2 preprocess
+validation_0866 dilate,blur highest,2 preprocess
+validation_0867 dilate,blur highest,2 preprocess
+validation_0868 dilate,blur highest,2 preprocess
+validation_0869 dilate,blur highest,2 preprocess
+validation_0870 dilate,blur highest,2 preprocess
+validation_0871 dilate,blur highest,2 preprocess
+validation_0872 dilate,blur highest,2 preprocess
+validation_0873 dilate,blur highest,2 preprocess
+validation_0874 dilate,blur highest,2 preprocess
+validation_0875 dilate,blur highest,2 preprocess
+validation_0876 dilate,blur highest,2 preprocess
+validation_0877 dilate,blur highest,2 preprocess
+validation_0878 dilate,blur highest,2 preprocess
+validation_0879 dilate,blur highest,2 preprocess
+validation_0880 dilate,blur highest,2 preprocess
+validation_0881 dilate,blur highest,2 preprocess
+validation_0882 dilate,blur highest,2 preprocess
+validation_0883 dilate,blur highest,2 preprocess
+validation_0884 dilate,blur highest,2 preprocess
+validation_0885 dilate,blur highest,2 preprocess
+validation_0886 dilate,blur highest,2 preprocess
+validation_0887 dilate,blur highest,2 preprocess
+validation_0888 dilate,blur highest,2 preprocess
+validation_0889 dilate,blur highest,2 preprocess
+validation_0890 dilate,blur highest,2 preprocess
+validation_0891 dilate,blur highest,2 preprocess
+validation_0892 dilate,blur highest,2 preprocess
+validation_0893 dilate,blur highest,2 preprocess
+validation_0894 dilate,blur highest,2 preprocess
+validation_0895 dilate,blur highest,2 preprocess
+validation_0896 dilate,blur highest,2 preprocess
+validation_0897 dilate,blur highest,2 preprocess
+validation_0898 dilate,blur highest,2 preprocess
+validation_0899 dilate,blur highest,2 preprocess
+validation_0900 dilate,blur highest,2 preprocess
+validation_0901 dilate,blur highest,2 preprocess
+validation_0902 dilate,blur highest,2 preprocess
+validation_0903 dilate,blur highest,2 preprocess
+validation_0904 dilate,blur highest,2 preprocess
+validation_0905 dilate,blur highest,2 preprocess
+validation_0906 dilate,blur highest,2 preprocess
+validation_0907 dilate,blur highest,2 preprocess
+validation_0908 dilate,blur highest,2 preprocess
+validation_0909 dilate,blur highest,2 preprocess
+validation_0910 dilate,blur highest,2 preprocess
+validation_0911 dilate,blur highest,2 preprocess
+validation_0912 dilate,blur highest,2 preprocess
+validation_0913 dilate,blur highest,2 preprocess
+validation_0914 dilate,blur highest,2 preprocess
+validation_0915 dilate,blur highest,2 preprocess
+validation_0916 dilate,blur highest,2 preprocess
+validation_0917 dilate,blur highest,2 preprocess
+validation_0918 dilate,blur highest,2 preprocess
+validation_0919 dilate,blur highest,2 preprocess
+validation_0920 dilate,blur highest,2 preprocess
+validation_0921 dilate,blur highest,2 preprocess
+validation_0922 dilate,blur highest,2 preprocess
+validation_0923 dilate,blur highest,2 preprocess
+validation_0924 dilate,blur highest,2 preprocess
+validation_0925 dilate,blur highest,2 preprocess
+validation_0926 dilate,blur highest,2 preprocess
+validation_0927 dilate,blur highest,2 preprocess
+validation_0928 dilate,blur highest,2 preprocess
+validation_0929 dilate,blur highest,2 preprocess
+validation_0930 dilate,blur highest,2 preprocess
+validation_0931 dilate,blur highest,2 preprocess
+validation_0932 dilate,blur highest,2 preprocess
+validation_0933 dilate,blur highest,2 preprocess
+validation_0934 dilate,blur highest,2 preprocess
+validation_0935 dilate,blur highest,2 preprocess
+validation_0936 dilate,blur highest,2 preprocess
+validation_0937 dilate,blur highest,2 preprocess
+validation_0938 dilate,blur highest,2 preprocess
+validation_0939 dilate,blur highest,2 preprocess
+validation_0940 dilate,blur highest,2 preprocess
+validation_0941 dilate,blur highest,2 preprocess
+validation_0942 dilate,blur highest,2 preprocess
+validation_0943 dilate,blur highest,2 preprocess
+validation_0944 dilate,blur highest,2 preprocess
+validation_0945 dilate,blur highest,2 preprocess
+validation_0946 dilate,blur highest,2 preprocess
+validation_0947 dilate,blur highest,2 preprocess
+validation_0948 dilate,blur highest,2 preprocess
+validation_0949 dilate,blur highest,2 preprocess
+validation_0950 dilate,blur highest,2 preprocess
+validation_0951 dilate,blur highest,2 preprocess
+validation_0952 dilate,blur highest,2 preprocess
+validation_0953 dilate,blur highest,2 preprocess
+validation_0954 dilate,blur highest,2 preprocess
+validation_0955 dilate,blur highest,2 preprocess
+validation_0956 dilate,blur highest,2 preprocess
+validation_0957 dilate,blur highest,2 preprocess
+validation_0958 dilate,blur highest,2 preprocess
+validation_0959 dilate,blur highest,2 preprocess
+validation_0960 dilate,blur highest,2 preprocess
+validation_0961 dilate,blur highest,2 preprocess
+validation_0962 dilate,blur highest,2 preprocess
+validation_0963 dilate,blur highest,2 preprocess
+validation_0964 dilate,blur highest,2 preprocess
+validation_0965 dilate,blur highest,2 preprocess
+validation_0966 dilate,blur highest,2 preprocess
+validation_0967 dilate,blur highest,2 preprocess
+validation_0968 dilate,blur highest,2 preprocess
+validation_0969 dilate,blur highest,2 preprocess
+validation_0970 dilate,blur highest,2 preprocess
+validation_0971 dilate,blur highest,2 preprocess
+validation_0972 dilate,blur highest,2 preprocess
+validation_0973 dilate,blur highest,2 preprocess
+validation_0974 dilate,blur highest,2 preprocess
+validation_0975 dilate,blur highest,2 preprocess
+train_0000 dilate,blur highest,2 preprocess
+train_0001 dilate,blur highest,2 preprocess
+train_0002 dilate,blur highest,2 preprocess
+train_0003 dilate, preprocess
+train_0004 dilate preprocess
+train_0005 dilate,blur highest,preprocess
+train_0006 dilate,blur highest,preprocess
+train_0007 erode,blur low,line, preprocess
+train_0008 erode, preprocess
+train_0009 dilate,blur highest,2 preprocess
+train_0000 dilate,blur highest,2 preprocess
+train_0001 dilate,blur highest,2 preprocess
+train_0002 dilate,blur highest,2 preprocess
+train_0003 dilate,blur highest,2 preprocess
+train_0004 dilate,blur highest,2 preprocess
+train_0005 dilate,blur highest,2 preprocess
+train_0006 dilate,blur highest,2 preprocess
+train_0007 dilate,blur highest,2 preprocess
+train_0008 dilate,blur highest,2 preprocess
+train_0009 dilate,blur highest,2 preprocess
+train_0010 dilate,blur highest,2 preprocess
+train_0011 dilate,blur highest,2 preprocess
+train_0012 dilate,blur highest,2 preprocess
+train_0013 dilate,blur highest,2 preprocess
+train_0014 dilate,blur highest,2 preprocess
+train_0015 dilate,blur highest,2 preprocess
+train_0016 dilate,blur highest,2 preprocess
+train_0017 dilate,blur highest,2 preprocess
+train_0018 dilate,blur highest,2 preprocess
+train_0019 dilate,blur highest,2 preprocess
+train_0020 dilate,blur highest,2 preprocess
+train_0021 dilate,blur highest,2 preprocess
+train_0022 dilate,blur highest,2 preprocess
+train_0023 dilate,blur highest,2 preprocess
+train_0024 dilate,blur highest,2 preprocess
+train_0025 dilate, preprocess
+train_0026 dilate, preprocess
+train_0027 dilate, preprocess
+train_0028 dilate, preprocess
+train_0029 dilate, preprocess
+train_0030 dilate, preprocess
+train_0031 dilate, preprocess
+train_0032 dilate, preprocess
+train_0033 dilate, preprocess
+train_0034 dilate, preprocess
+train_0035 dilate, preprocess
+train_0036 dilate, preprocess
+train_0037 dilate, preprocess
+train_0038 dilate preprocess
+train_0039 dilate preprocess
+train_0040 dilate preprocess
+train_0041 dilate preprocess
+train_0042 dilate preprocess
+train_0043 dilate preprocess
+train_0044 dilate preprocess
+train_0045 dilate preprocess
+train_0046 dilate preprocess
+train_0047 dilate preprocess
+train_0048 dilate preprocess
+train_0049 dilate preprocess
+train_0050 dilate,blur highest,preprocess
+train_0051 dilate,blur highest,preprocess
+train_0052 dilate,blur highest,preprocess
+train_0053 dilate,blur highest,preprocess
+train_0054 dilate,blur highest,preprocess
+train_0055 dilate,blur highest,preprocess
+train_0056 dilate,blur highest,preprocess
+train_0057 dilate,blur highest,preprocess
+train_0058 dilate,blur highest,preprocess
+train_0059 dilate,blur highest,preprocess
+train_0060 dilate,blur highest,preprocess
+train_0061 dilate,blur highest,preprocess
+train_0062 dilate,blur highest,preprocess
+train_0063 erode,blur low,line, preprocess
+train_0064 erode,blur low,line, preprocess
+train_0065 erode,blur low,line, preprocess
+train_0066 erode,blur low,line, preprocess
+train_0067 erode,blur low,line, preprocess
+train_0068 erode,blur low,line, preprocess
+train_0069 erode,blur low,line, preprocess
+train_0070 erode,blur low,line, preprocess
+train_0071 erode,blur low,line, preprocess
+train_0072 erode,blur low,line, preprocess
+train_0073 erode,blur low,line, preprocess
+train_0074 erode,blur low,line, preprocess
+train_0075 erode, preprocess
+train_0076 erode, preprocess
+train_0077 erode, preprocess
+train_0078 erode, preprocess
+train_0079 erode, preprocess
+train_0080 erode, preprocess
+train_0081 erode, preprocess
+train_0082 erode, preprocess
+train_0083 erode, preprocess
+train_0084 erode, preprocess
+train_0085 erode, preprocess
+train_0086 erode, preprocess
+train_0087 erode, preprocess
+train_0088 dilate,blur highest,2 preprocess
+train_0089 dilate,blur highest,2 preprocess
+train_0090 dilate,blur highest,2 preprocess
+train_0091 dilate,blur highest,2 preprocess
+train_0092 dilate,blur highest,2 preprocess
+train_0093 dilate,blur highest,2 preprocess
+train_0094 dilate,blur highest,2 preprocess
+train_0095 dilate,blur highest,2 preprocess
+train_0096 dilate,blur highest,2 preprocess
+train_0097 dilate,blur highest,2 preprocess
+train_0098 dilate,blur highest,2 preprocess
+train_0099 dilate,blur highest,2 preprocess
+train_0000 dilate,blur highest,2 preprocess
+train_0001 dilate,blur highest,2 preprocess
+train_0002 dilate,blur highest,2 preprocess
+train_0003 dilate,blur highest,2 preprocess
+train_0004 dilate,blur highest,2 preprocess
+train_0005 dilate,blur highest,2 preprocess
+train_0006 dilate,blur highest,2 preprocess
+train_0007 dilate,blur highest,2 preprocess
+train_0008 dilate,blur highest,2 preprocess
+train_0009 dilate,blur highest,2 preprocess
+train_0010 dilate,blur highest,2 preprocess
+train_0011 dilate,blur highest,2 preprocess
+train_0012 dilate,blur highest,2 preprocess
+train_0013 dilate,blur highest,2 preprocess
+train_0014 dilate,blur highest,2 preprocess
+train_0015 dilate,blur highest,2 preprocess
+train_0016 dilate,blur highest,2 preprocess
+train_0017 dilate,blur highest,2 preprocess
+train_0018 dilate,blur highest,2 preprocess
+train_0019 dilate,blur highest,2 preprocess
+train_0020 dilate,blur highest,2 preprocess
+train_0021 dilate,blur highest,2 preprocess
+train_0022 dilate,blur highest,2 preprocess
+train_0023 dilate,blur highest,2 preprocess
+train_0024 dilate,blur highest,2 preprocess
+train_0025 dilate, preprocess
+train_0026 dilate, preprocess
+train_0027 dilate, preprocess
+train_0028 dilate, preprocess
+train_0029 dilate, preprocess
+train_0030 dilate, preprocess
+train_0031 dilate, preprocess
+train_0032 dilate, preprocess
+train_0033 dilate, preprocess
+train_0034 dilate, preprocess
+train_0035 dilate, preprocess
+train_0036 dilate, preprocess
+train_0037 dilate, preprocess
+train_0038 dilate preprocess
+train_0039 dilate preprocess
+train_0040 dilate preprocess
+train_0041 dilate preprocess
+train_0042 dilate preprocess
+train_0043 dilate preprocess
+train_0044 dilate preprocess
+train_0045 dilate preprocess
+train_0046 dilate preprocess
+train_0047 dilate preprocess
+train_0048 dilate preprocess
+train_0049 dilate preprocess
+train_0050 dilate,blur highest,preprocess
+train_0051 dilate,blur highest,preprocess
+train_0052 dilate,blur highest,preprocess
+train_0053 dilate,blur highest,preprocess
+train_0054 dilate,blur highest,preprocess
+train_0055 dilate,blur highest,preprocess
+train_0056 dilate,blur highest,preprocess
+train_0057 dilate,blur highest,preprocess
+train_0058 dilate,blur highest,preprocess
+train_0059 dilate,blur highest,preprocess
+train_0060 dilate,blur highest,preprocess
+train_0061 dilate,blur highest,preprocess
+train_0062 dilate,blur highest,preprocess
+train_0063 erode,blur low,line, preprocess
+train_0064 erode,blur low,line, preprocess
+train_0065 erode,blur low,line, preprocess
+train_0066 erode,blur low,line, preprocess
+train_0067 erode,blur low,line, preprocess
+train_0068 erode,blur low,line, preprocess
+train_0069 erode,blur low,line, preprocess
+train_0070 erode,blur low,line, preprocess
+train_0071 erode,blur low,line, preprocess
+train_0072 erode,blur low,line, preprocess
+train_0073 erode,blur low,line, preprocess
+train_0074 erode,blur low,line, preprocess
+train_0075 erode, preprocess
+train_0076 erode, preprocess
+train_0077 erode, preprocess
+train_0078 erode, preprocess
+train_0079 erode, preprocess
+train_0080 erode, preprocess
+train_0081 erode, preprocess
+train_0082 erode, preprocess
+train_0083 erode, preprocess
+train_0084 erode, preprocess
+train_0085 erode, preprocess
+train_0086 erode, preprocess
+train_0087 erode, preprocess
+train_0088 dilate,blur highest,2 preprocess
+train_0089 dilate,blur highest,2 preprocess
+train_0090 dilate,blur highest,2 preprocess
+train_0091 dilate,blur highest,2 preprocess
+train_0092 dilate,blur highest,2 preprocess
+train_0093 dilate,blur highest,2 preprocess
+train_0094 dilate,blur highest,2 preprocess
+train_0095 dilate,blur highest,2 preprocess
+train_0096 dilate,blur highest,2 preprocess
+train_0097 dilate,blur highest,2 preprocess
+train_0098 dilate,blur highest,2 preprocess
+train_0099 dilate,blur highest,2 preprocess
+train_0000 dilate,blur highest,2 preprocess
+train_0001 dilate,blur highest,2 preprocess
+train_0002 dilate,blur highest,2 preprocess
+train_0003 dilate,blur highest,2 preprocess
+train_0004 dilate,blur highest,2 preprocess
+train_0005 dilate,blur highest,2 preprocess
+train_0006 dilate,blur highest,2 preprocess
+train_0007 dilate,blur highest,2 preprocess
+train_0008 dilate,blur highest,2 preprocess
+train_0009 dilate,blur highest,2 preprocess
+train_0010 dilate,blur highest,2 preprocess
+train_0011 dilate,blur highest,2 preprocess
+train_0012 dilate,blur highest,2 preprocess
+train_0013 dilate, preprocess
+train_0014 dilate, preprocess
+train_0015 dilate, preprocess
+train_0016 dilate, preprocess
+train_0017 dilate, preprocess
+train_0018 dilate, preprocess
+train_0019 dilate preprocess
+train_0020 dilate preprocess
+train_0021 dilate preprocess
+train_0022 dilate preprocess
+train_0023 dilate preprocess
+train_0024 dilate preprocess
+train_0025 dilate,blur highest,preprocess
+train_0026 dilate,blur highest,preprocess
+train_0027 dilate,blur highest,preprocess
+train_0028 dilate,blur highest,preprocess
+train_0029 dilate,blur highest,preprocess
+train_0030 dilate,blur highest,preprocess
+train_0031 dilate,blur highest,preprocess
+train_0032 erode,blur low,line, preprocess
+train_0033 erode,blur low,line, preprocess
+train_0034 erode,blur low,line, preprocess
+train_0035 erode,blur low,line, preprocess
+train_0036 erode,blur low,line, preprocess
+train_0037 erode,blur low,line, preprocess
+train_0038 erode, preprocess
+train_0039 erode, preprocess
+train_0040 erode, preprocess
+train_0041 erode, preprocess
+train_0042 erode, preprocess
+train_0043 erode, preprocess
+train_0044 dilate,blur highest,2 preprocess
+train_0045 dilate,blur highest,2 preprocess
+train_0046 dilate,blur highest,2 preprocess
+train_0047 dilate,blur highest,2 preprocess
+train_0048 dilate,blur highest,2 preprocess
+train_0049 dilate,blur highest,2 preprocess

@@ -305,6 +305,62 @@ Dengan cara ini, Anda tidak perlu mengelola file `.zip` secara manual. Library `
 
 ---
 
+## 11. 🖼️ Membuat Gambar Terdegradasi Sintetis (IAM)
+
+Setelah dataset IAM diunduh dan disiapkan, langkah selanjutnya adalah membuat versi terdegradasi dari gambar-gambar tersebut. Proses ini menggunakan gambar artefak/noise dari direktori `datasets/background_images/` untuk menciptakan variasi data training.
+
+### 11.1. Persiapan
+
+1.  **Siapkan Gambar Artefak:**
+    Pastikan Anda sudah men-download dan menempatkan gambar-gambar yang akan digunakan sebagai noise/artefak di dalam direktori `datasets/background_images/`. Skrip mendukung format `.jpg` dan `.bmp`.
+
+2.  **Pastikan Dataset IAM Ada:**
+    Dataset IAM harus sudah terstruktur dengan benar di dalam `datasets/iam_raw/` dengan sub-direktori `train`, `validation`, dan `test`.
+
+### 11.2. Buat Daftar File Gambar
+
+Untuk memetakan gambar mana yang akan diproses, kita perlu membuat daftar file untuk setiap set (train, valid, test). Saya sudah menyediakan skrip untuk melakukan ini secara otomatis.
+
+Jalankan perintah berikut dari direktori utama proyek:
+```bash
+poetry run python create_iam_file_lists.py
+```
+Perintah ini akan menghasilkan tiga file di dalam direktori `Sets/`:
+- `list_train_iam.txt`
+- `list_valid_iam.txt`
+- `list_test_iam.txt`
+
+### 11.3. Jalankan Skrip Degradasi Gambar
+
+Sekarang Anda siap untuk membuat gambar terdegradasi. Gunakan skrip `distort_image_iam.py` dengan memberikan argumen set mana yang ingin Anda proses (`train`, `valid`, atau `test`).
+
+**Contoh Penggunaan:**
+
+- **Untuk memproses set `test`:**
+  ```bash
+  poetry run python distort_image_iam.py test
+  ```
+
+- **Untuk memproses set `train`:**
+  ```bash
+  poetry run python distort_image_iam.py train
+  ```
+
+- **Untuk memproses set `valid`:**
+  ```bash
+  poetry run python distort_image_iam.py valid
+  ```
+
+Skrip akan:
+1.  Membaca daftar file yang sesuai (misalnya, `list_test_iam.txt`).
+2.  Mengambil setiap gambar asli dari `datasets/iam_raw/test/images/`.
+3.  Secara acak menerapkan artefak dari `datasets/background_images/`.
+4.  Menyimpan hasilnya di direktori `datasets/iam_distorted/`.
+
+Proses ini bisa memakan waktu cukup lama, terutama untuk set `train` yang besar.
+
+---
+
 ## 🎉 Proyek Siap Digunakan!
 
 > **Happy coding!** 🚀

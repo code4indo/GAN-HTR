@@ -74,6 +74,8 @@ yarl = "1.9.4"
 zipp = "3.19.2"
 kagglehub = {extras = ["hf-datasets"], version = "^0.3.12"}
 datasets = "^4.0.0"
+imageio = "^2.37.0"
+augraphy = {extras = ["all"], version = "^8.2.6"}
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.4"
