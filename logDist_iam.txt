@@ -1234,3 +1234,64 @@ train_0046 dilate,blur highest,2 preprocess
 train_0047 dilate,blur highest,2 preprocess
 train_0048 dilate,blur highest,2 preprocess
 train_0049 dilate,blur highest,2 preprocess
+train_0000 dilate,blur highest,2 preprocess
+train_0000 dilate,blur highest,2 preprocess
+train_0001 dilate,blur highest,2 preprocess
+train_0002 dilate,blur highest,2 preprocess
+train_0003 dilate,blur highest,2 preprocess
+train_0004 dilate,blur highest,2 preprocess
+train_0005 dilate,blur highest,2 preprocess
+train_0006 dilate,blur highest,2 preprocess
+train_0007 dilate,blur highest,2 preprocess
+train_0008 dilate,blur highest,2 preprocess
+train_0009 dilate,blur highest,2 preprocess
+train_0010 dilate,blur highest,2 preprocess
+train_0011 dilate,blur highest,2 preprocess
+train_0012 dilate,blur highest,2 preprocess
+train_0013 dilate, preprocess
+train_0014 dilate, preprocess
+train_0015 dilate, preprocess
+train_0016 dilate, preprocess
+train_0017 dilate, preprocess
+train_0018 dilate, preprocess
+train_0019 dilate preprocess
+train_0020 dilate preprocess
+train_0021 dilate preprocess
+train_0022 dilate preprocess
+train_0023 dilate preprocess
+train_0024 dilate preprocess
+train_0025 dilate,blur highest,preprocess
+train_0026 dilate,blur highest,preprocess
+train_0027 dilate,blur highest,preprocess
+train_0028 dilate,blur highest,preprocess
+train_0029 dilate,blur highest,preprocess
+train_0030 dilate,blur highest,preprocess
+train_0031 dilate,blur highest,preprocess
+train_0032 erode,blur low,line, preprocess
+train_0033 erode,blur low,line, preprocess
+train_0034 erode,blur low,line, preprocess
+train_0035 erode,blur low,line, preprocess
+train_0036 erode,blur low,line, preprocess
+train_0037 erode,blur low,line, preprocess
+train_0038 erode, preprocess
+train_0039 erode, preprocess
+train_0040 erode, preprocess
+train_0041 erode, preprocess
+train_0042 erode, preprocess
+train_0043 erode, preprocess
+train_0044 dilate,blur highest,2 preprocess
+train_0045 dilate,blur highest,2 preprocess
+train_0046 dilate,blur highest,2 preprocess
+train_0047 dilate,blur highest,2 preprocess
+train_0048 dilate,blur highest,2 preprocess
+train_0049 dilate,blur highest,2 preprocess
+train_0000 dilate,blur highest,2 preprocess
+train_0001 dilate,blur highest,2 preprocess
+train_0002 dilate,blur highest,2 preprocess
+train_0003 dilate, preprocess
+train_0004 dilate preprocess
+train_0005 dilate,blur highest,preprocess
+train_0006 dilate,blur highest,preprocess
+train_0007 erode,blur low,line, preprocess
+train_0008 erode, preprocess
+train_0009 dilate,blur highest,2 preprocess

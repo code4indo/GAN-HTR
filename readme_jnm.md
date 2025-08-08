@@ -207,7 +207,7 @@ watch -n 1 nvidia-smi
 ## 8. 🔧 Troubleshooting dengan Poetry
 
 | Masalah | Solusi |
-|---------|--------|
+|--------|--------|
 | ❌ Perintah `python` tidak ditemukan | Pastikan Anda sudah mengaktifkan shell dengan `poetry shell`, atau gunakan `poetry run`. |
 | 🔄 Ingin mengupdate library | Gunakan `poetry update <nama_package>` atau `poetry update` untuk semua. |
 | 🔍 Ingin melihat info environment | `poetry env info` akan menampilkan path ke virtual environment dan versi Python. |
@@ -358,6 +358,36 @@ Skrip akan:
 4.  Menyimpan hasilnya di direktori `datasets/iam_distorted/`.
 
 Proses ini bisa memakan waktu cukup lama, terutama untuk set `train` yang besar.
+
+---
+
+## 12. 📄 Membuat Dataset Degradasi Sintetis (Fleksibel)
+
+Skrip `create_synthetic_degradation.py` menyediakan cara yang lebih fleksibel untuk membuat dataset terdegradasi. Skrip ini mengambil potongan acak dari gambar sumber degradasi dan menggabungkannya dengan gambar teks bersih.
+
+### 12.1. Konfigurasi
+- **Sumber Gambar Bersih**: Diatur oleh variabel `CLEAN_IMAGE_DIR` di dalam skrip. Defaultnya adalah `datasets/iam_raw/test/images`.
+- **Sumber Gambar Degradasi**: Diatur oleh variabel `DEGRADATION_SOURCE_DIR`. Defaultnya adalah `datasets/cropDoc`.
+- **Direktori Output**: Diatur oleh variabel `OUTPUT_DIR`. Defaultnya adalah `datasets/synthetic_iam_test_degraded`.
+
+Anda dapat mengubah path ini langsung di dalam file skrip sesuai kebutuhan.
+
+### 12.2. Penggunaan
+Skrip ini dapat dijalankan dalam dua mode: Grayscale (default) atau Warna.
+
+- **Mode Grayscale (Default):**
+  Mode ini akan mengubah sumber degradasi menjadi grayscale sebelum digabungkan. Ini adalah mode yang direkomendasikan untuk realisme dokumen lama.
+  ```bash
+  poetry run python create_synthetic_degradation.py
+  ```
+
+- **Mode Warna (RGB):**
+  Gunakan flag `--color` untuk mempertahankan warna asli dari gambar sumber degradasi.
+  ```bash
+  poetry run python create_synthetic_degradation.py --color
+  ```
+
+Skrip akan secara otomatis membuat direktori output dan menyimpan gambar-gambar yang telah diproses di sana.
 
 ---
 
