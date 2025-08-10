@@ -361,33 +361,86 @@ Proses ini bisa memakan waktu cukup lama, terutama untuk set `train` yang besar.
 
 ---
 
-## 12. 📄 Membuat Dataset Degradasi Sintetis (Fleksibel)
+## 12. 🖼️ Ekstraksi Latar Belakang Degradasi Otomatis
 
-Skrip `create_synthetic_degradation.py` menyediakan cara yang lebih fleksibel untuk membuat dataset terdegradasi. Skrip ini mengambil potongan acak dari gambar sumber degradasi dan menggabungkannya dengan gambar teks bersih.
+Untuk membuat dataset sintetis yang realistis, kita memerlukan banyak contoh latar belakang yang rusak (noda, lipatan, kertas usang, dll.). Skrip `extract_degradation_patches.py` membantu mengotomatiskan proses ini dengan mengekstrak potongan-potongan (patch) yang relevan dari koleksi dokumen rusak Anda.
 
-### 12.1. Konfigurasi
-- **Sumber Gambar Bersih**: Diatur oleh variabel `CLEAN_IMAGE_DIR` di dalam skrip. Defaultnya adalah `datasets/iam_raw/test/images`.
-- **Sumber Gambar Degradasi**: Diatur oleh variabel `DEGRADATION_SOURCE_DIR`. Defaultnya adalah `datasets/cropDoc`.
-- **Direktori Output**: Diatur oleh variabel `OUTPUT_DIR`. Defaultnya adalah `datasets/synthetic_iam_test_degraded`.
+### 12.1. Konsep
+Skrip ini bekerja dengan cara:
+1.  Memindai setiap dokumen sumber di direktori yang Anda tentukan.
+2.  Membagi dokumen menjadi potongan-potongan dengan berbagai ukuran.
+3.  Menganalisis setiap potongan dan hanya menyimpan yang memenuhi kriteria:
+    - **Kerusakan Cukup:** Memiliki variasi visual yang tinggi (tidak hanya area kosong).
+    - **Minim Teks:** Tidak mengandung terlalu banyak sisa-sisa tulisan tangan atau cetakan.
+4.  Menyimpan potongan-potongan yang lolos seleksi ke direktori output.
 
-Anda dapat mengubah path ini langsung di dalam file skrip sesuai kebutuhan.
+### 12.2. Persiapan
+1.  Siapkan koleksi dokumen rusak Anda (misalnya pindaian dari arsip).
+2.  Tempatkan semua file tersebut dalam satu direktori, misalnya `datasets/anriRusak`.
 
-### 12.2. Penggunaan
-Skrip ini dapat dijalankan dalam dua mode: Grayscale (default) atau Warna.
+### 12.3. Penggunaan
+Jalankan skrip dari direktori utama proyek. Untuk penggunaan standar, Anda tidak perlu menambahkan argumen apa pun.
 
-- **Mode Grayscale (Default):**
-  Mode ini akan mengubah sumber degradasi menjadi grayscale sebelum digabungkan. Ini adalah mode yang direkomendasikan untuk realisme dokumen lama.
+- **Perintah Dasar:**
+  ```bash
+  poetry run python extract_degradation_patches.py
+  ```
+  Perintah ini akan menggunakan nilai default:
+  - `--source-dir`: `datasets/anriRusak`
+  - `--output-dir`: `datasets/background_images_extracted`
+  - `--patch-sizes`: `3000x1024,2048x512,1024x512,512x512,256x256`
+
+- **Contoh Perintah Kustom:**
+  Jika Anda ingin menyesuaikan parameter, misalnya untuk mendapatkan lebih banyak patch dengan mengizinkan sedikit lebih banyak teks:
+  ```bash
+  poetry run python extract_degradation_patches.py \
+    --source-dir "koleksi_dokumen_rusak_saya" \
+    --output-dir "koleksi_latar_belakang_saya" \
+    --std-threshold 12.0 \
+    --text-threshold 8.0
+  ```
+
+### 12.4. Kurasi Manual (Langkah Penting)
+Setelah skrip selesai, buka direktori output (`datasets/background_images_extracted`). Anda akan melihat banyak gambar. Lakukan kurasi manual cepat:
+- Gunakan penampil gambar dengan mode thumbnail.
+- Hapus patch yang terlihat tidak bagus atau masih mengandung banyak teks.
+
+Hasil dari proses ini adalah kumpulan latar belakang berkualitas tinggi yang siap digunakan oleh skrip `create_synthetic_degradation.py`.
+
+---
+
+## 13. 📄 Membuat Dataset Degradasi Sintetis (Fleksibel)
+
+Skrip `create_synthetic_degradation.py` menyediakan cara yang fleksibel untuk membuat dataset terdegradasi. Skrip ini mengambil potongan acak dari gambar sumber degradasi dan menggabungkannya dengan gambar teks bersih.
+
+### 13.1. Argumen Command-Line
+Skrip ini sekarang menerima argumen melalui command-line untuk mengontrol direktori input dan output, serta mode warna.
+
+- `--clean-dir`: Path ke direktori yang berisi gambar teks bersih.
+- `--degradation-dir`: Path ke direktori yang berisi gambar sumber degradasi (hasil dari langkah 12).
+- `--output-dir`: Path ke direktori untuk menyimpan hasil gambar terdegradasi.
+- `--color`: Flag untuk menghasilkan gambar berwarna (RGB).
+
+### 13.2. Contoh Penggunaan
+- **Menggunakan Latar Hasil Ekstraksi:**
+  Gunakan direktori output dari skrip `extract_degradation_patches.py` sebagai sumber degradasi.
+  ```bash
+  poetry run python create_synthetic_degradation.py \
+    --clean-dir "nan_raw/test/images" \
+    --degradation-dir "datasets/background_images_extracted" \
+    --output-dir "datasets/synthetic_test_degraded" \
+    --color
+  ```
+
+- **Menjalankan dengan Konfigurasi Default (Grayscale):**
   ```bash
   poetry run python create_synthetic_degradation.py
   ```
 
-- **Mode Warna (RGB):**
-  Gunakan flag `--color` untuk mempertahankan warna asli dari gambar sumber degradasi.
-  ```bash
-  poetry run python create_synthetic_degradation.py --color
-  ```
-
-Skrip akan secara otomatis membuat direktori output dan menyimpan gambar-gambar yang telah diproses di sana.
+Anda dapat memeriksa semua opsi yang tersedia dengan menjalankan:
+```bash
+poetry run python create_synthetic_degradation.py --help
+```
 
 ---
 
