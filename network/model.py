@@ -359,7 +359,7 @@ def bluche(input_size, d_model):
     cnn = Conv2D(filters=128, kernel_size=(3, 3), strides=(1, 1), padding="same", activation="tanh")(cnn)
     cnn = MaxPooling2D(pool_size=(1, 4), strides=(1, 4), padding="valid")(cnn)
 
-    shape = cnn.get_shape()
+    shape = cnn.shape
     blstm = Reshape((shape[1], shape[2] * shape[3]))(cnn)
 
     blstm = Bidirectional(LSTM(units=128, return_sequences=True))(blstm)
@@ -412,9 +412,9 @@ def puigcerver(input_size, d_model):
     cnn = Dropout(rate=0.2)(cnn)
     cnn = Conv2D(filters=80, kernel_size=(3, 3), strides=(1, 1), padding="same")(cnn)
     cnn = BatchNormalization()(cnn)
-    cnn = LeakyReLU(alpha=0.01)(cnn)
+    cnn = LeakyReLU(negative_slope=0.01)(cnn)
 
-    shape = cnn.get_shape()
+    shape = cnn.shape
     blstm = Reshape((shape[1], shape[2] * shape[3]))(cnn)
 
     blstm = Bidirectional(LSTM(units=256, return_sequences=True, dropout=0.5))(blstm)
@@ -438,39 +438,39 @@ def flor(input_size, d_model):
 
     cnn = Conv2D(filters=16, kernel_size=(3, 3), strides=(2, 2), padding="same", kernel_initializer="he_uniform")(input_data)
     cnn = PReLU(shared_axes=[1, 2])(cnn)
-    cnn = BatchNormalization(renorm=True)(cnn)
+    cnn = BatchNormalization()(cnn)
     cnn = FullGatedConv2D(filters=16, kernel_size=(3, 3), padding="same")(cnn)
 
     cnn = Conv2D(filters=32, kernel_size=(3, 3), strides=(1, 1), padding="same", kernel_initializer="he_uniform")(cnn)
     cnn = PReLU(shared_axes=[1, 2])(cnn)
-    cnn = BatchNormalization(renorm=True)(cnn)
+    cnn = BatchNormalization()(cnn)
     cnn = FullGatedConv2D(filters=32, kernel_size=(3, 3), padding="same")(cnn)
 
     cnn = Conv2D(filters=40, kernel_size=(2, 4), strides=(2, 4), padding="same", kernel_initializer="he_uniform")(cnn)
     cnn = PReLU(shared_axes=[1, 2])(cnn)
-    cnn = BatchNormalization(renorm=True)(cnn)
+    cnn = BatchNormalization()(cnn)
     cnn = FullGatedConv2D(filters=40, kernel_size=(3, 3), padding="same", kernel_constraint=MaxNorm(4, [0, 1, 2]))(cnn)
     cnn = Dropout(rate=0.2)(cnn)
 
     cnn = Conv2D(filters=48, kernel_size=(3, 3), strides=(1, 1), padding="same", kernel_initializer="he_uniform")(cnn)
     cnn = PReLU(shared_axes=[1, 2])(cnn)
-    cnn = BatchNormalization(renorm=True)(cnn)
+    cnn = BatchNormalization()(cnn)
     cnn = FullGatedConv2D(filters=48, kernel_size=(3, 3), padding="same", kernel_constraint=MaxNorm(4, [0, 1, 2]))(cnn)
     cnn = Dropout(rate=0.2)(cnn)
 
     cnn = Conv2D(filters=56, kernel_size=(2, 4), strides=(2, 4), padding="same", kernel_initializer="he_uniform")(cnn)
     cnn = PReLU(shared_axes=[1, 2])(cnn)
-    cnn = BatchNormalization(renorm=True)(cnn)
+    cnn = BatchNormalization()(cnn)
     cnn = FullGatedConv2D(filters=56, kernel_size=(3, 3), padding="same", kernel_constraint=MaxNorm(4, [0, 1, 2]))(cnn)
     cnn = Dropout(rate=0.2)(cnn)
 
     cnn = Conv2D(filters=64, kernel_size=(3, 3), strides=(1, 1), padding="same", kernel_initializer="he_uniform")(cnn)
     cnn = PReLU(shared_axes=[1, 2])(cnn)
-    cnn = BatchNormalization(renorm=True)(cnn)
+    cnn = BatchNormalization()(cnn)
 
     cnn = MaxPooling2D(pool_size=(1, 2), strides=(1, 2), padding="valid")(cnn)
 
-    shape = cnn.get_shape()
+    shape = cnn.shape
     bgru = Reshape((shape[1], shape[2] * shape[3]))(cnn)
 
     bgru = Bidirectional(GRU(units=128, return_sequences=True, dropout=0.5))(bgru)
@@ -539,7 +539,7 @@ def puigcerver_octconv(input_size, d_model):
 
     x = _create_octconv_last_block([high, low], 80, alpha)
 
-    shape = x.get_shape()
+    shape = x.shape
     blstm = Reshape((shape[1], shape[2] * shape[3]))(x)
 
     blstm = Bidirectional(LSTM(units=256, return_sequences=True, dropout=0.5))(blstm)

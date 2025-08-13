@@ -126,7 +126,7 @@ def read_file_char(list_file_path):
 		list0.append(l.strip())
 
 	return list0
-charset_base = read_file_char(rootPath+ 'Sets/CHAR_LIST')
+	charset_base = read_file_char(rootPath+ 'Sets/CHAR_LIST')
 f=codecs.open('charlist.txt','w','utf-8')
 f.writelines(charset_base)
 f.close()
@@ -170,7 +170,7 @@ def unet(pretrained_weights=None, input_size=(128,1024, 1)):
 	drop5 = Dropout(0.5)(bn)
 
 	up6 = Conv2D(512, 2, activation='relu', padding='same', kernel_initializer='he_normal')(UpSampling2D(size=(2, 2))(drop5))
-# 	 merge6 = merge([drop4,up6], mode = 'concat', concat_axis = 3)
+	# 	 merge6 = merge([drop4,up6], mode = 'concat', concat_axis = 3)
 	bn = BatchNormalization(momentum=0.8)(up6)
 	merge6 = concatenate ([drop4, bn])
 	conv6 = Conv2D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal')(merge6)
@@ -223,7 +223,7 @@ def get_optimizer():
 def build_discriminator_1():
 
 	def d_layer(layer_input, filters, f_size=4, bn=True):
-# 		 """Discriminator layer"""
+	# 		 """Discriminator layer"""
 		d = Conv2D(filters, kernel_size=f_size, strides=2, padding='same')(layer_input)
 		d = LeakyReLU(alpha=0.2)(d)
 		if bn:
@@ -315,11 +315,11 @@ def readGrayPair(im_name, split='train'):
 	original_image = Image.open(deg_image_path)  # /255.0
 	original_image = original_image.resize((1024,128), Image.LANCZOS)
 	grey_image = original_image.convert('L')
-	
 	grey_image.save("deg_image2.png")
 	deg_image = plt.imread("deg_image2.png")
-	
-	gt_image_path = os.path.join(DatabasePath, split, 'images', im_name)
+	deg_image = plt.imread("deg_image2.png")
+	gt_image_path = os.path.join(DatabasePath, split, "images", im_name)
+	original_image = Image.open(gt_image_path)
 	original_image = Image.open(gt_image_path)
 	original_image = original_image.resize((1024,128), Image.LANCZOS)
 	grey_image = original_image.convert('L')
@@ -342,7 +342,7 @@ def vconcat_resize(img_list, interpolation
     # return final image 
     return cv2.vconcat(im_list_resize) 	
  
-###############New GAN######################
+	###############New GAN######################
 def get_gan_network(discriminator_1,discriminator_2, generator, optimizer):
 	
 	discriminator_1.trainable = False
@@ -388,7 +388,7 @@ def train_gan(generator, discriminator_1,discriminator_2,gan,ep_start=0, epochs=
 	batch_train = np.zeros((((batch_size, 128,1024, 1))))
 	batch_target = np.zeros((((batch_size, 128,1024, 1))))
 	
-batch_train_gt_path=[]
+	batch_train_gt_path=[]
 	
 	# Build our GAN netowrks , 2 gans
 	#fc=codecs.open('histo.txt','w+','utf-8')
@@ -577,7 +577,7 @@ def save(gan, generator, discriminator_1,discriminator_2,epoch):
 	
 
 	
-gan.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/gan_weights.h5")	
+	gan.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/gan_weights.h5")
 	
 discriminator_1.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/discriminator_weights.h5")
 	discriminator_2.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/rcnn_weights.h5")
@@ -661,7 +661,7 @@ def loadCRNNModel(epoch,mode_crnn='no_progressive'):
 	input_size = (1024, 128, 1)
 	dtgen = DataGenerator(source=source_path,
 					
-batch_size=batch_size,
+	batch_size=batch_size,
 						charset=charset_base,
 						max_text_length=max_text_length)
 
@@ -735,7 +735,7 @@ def predict_gan(epoch, generator,list_image_valid,set):
 			
 			
 			
-grey_image = original_image.convert('L')
+	grey_image = original_image.convert('L')
 grey_image.save("deg_image3.png")
 deg_image = plt.imread("deg_image3.png")
 			
@@ -870,7 +870,7 @@ def get_psnr_iam():
 	av = recap / qo
 	print('average psnr: ')
 	print(av)
-if __name__ == '__main__':
+	if __name__ == '__main__':
  
 	#############Train the GAN
 	train_GAN_crnn(150,8)

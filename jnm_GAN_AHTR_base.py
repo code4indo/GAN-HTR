@@ -307,21 +307,20 @@ def build_discriminator_3():
 	model.compile(optimizer=optimizer, loss=ctc_loss_lambda_func)
 
 	 
-	return model
-	
-def readGrayPair(im_name, split='train'):
-	deg_image_path = os.path.join('datasets/nan_distorted/', split, im_name)
+	return model	
+def readGrayPair(im_name):
+	deg_image_path = ('datasets/iam_distorted/' + im_name + '.png')
 
 	original_image = Image.open(deg_image_path)  # /255.0
-	original_image = original_image.resize((1024,128), Image.LANCZOS)
+	original_image = original_image.resize((1024,128), Image.ANTIALIAS)
 	grey_image = original_image.convert('L')
 	
-	grey_image.save("deg_image2.png")
+grey_image.save("deg_image2.png")
 	deg_image = plt.imread("deg_image2.png")
 	
-	gt_image_path = os.path.join(DatabasePath, split, 'images', im_name)
-	original_image = Image.open(gt_image_path)
-	original_image = original_image.resize((1024,128), Image.LANCZOS)
+gt_image_path = (DatabasePath + '/' + im_name + '.png')
+	original_image = Image.open(gt_image_path)  # /255.0
+	original_image = original_image.resize((1024,128), Image.ANTIALIAS)
 	grey_image = original_image.convert('L')
 	grey_image.save("gt_image2.png")
 	gt_image = plt.imread("gt_image2.png")
