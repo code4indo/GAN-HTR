@@ -45,7 +45,7 @@ from data import preproc as pp
 ##########################################################################################################
 ##########################################################################################################
 rootPath='./'
-DatabasePath='datasets/iam_raw/'
+DatabasePath='datasets/nan_raw_biner/'
 scenario='S_iam_OP'
 
 # define parameters
@@ -126,7 +126,7 @@ def read_file_char(list_file_path):
 		list0.append(l.strip())
 
 	return list0
-	charset_base = read_file_char(rootPath+ 'Sets/CHAR_LIST')
+charset_base = read_file_char(rootPath+ 'Sets/CHAR_LIST')
 f=codecs.open('charlist.txt','w','utf-8')
 f.writelines(charset_base)
 f.close()
@@ -170,7 +170,7 @@ def unet(pretrained_weights=None, input_size=(128,1024, 1)):
 	drop5 = Dropout(0.5)(bn)
 
 	up6 = Conv2D(512, 2, activation='relu', padding='same', kernel_initializer='he_normal')(UpSampling2D(size=(2, 2))(drop5))
-	# 	 merge6 = merge([drop4,up6], mode = 'concat', concat_axis = 3)
+# 	 merge6 = merge([drop4,up6], mode = 'concat', concat_axis = 3)
 	bn = BatchNormalization(momentum=0.8)(up6)
 	merge6 = concatenate ([drop4, bn])
 	conv6 = Conv2D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal')(merge6)
@@ -217,13 +217,13 @@ def unet(pretrained_weights=None, input_size=(128,1024, 1)):
 	return model
 
 def get_optimizer():
-	return Adam(lr=1e-4)
+	return Adam(learning_rate=1e-4)
 
 
 def build_discriminator_1():
 
 	def d_layer(layer_input, filters, f_size=4, bn=True):
-	# 		 """Discriminator layer"""
+# 		 """Discriminator layer"""
 		d = Conv2D(filters, kernel_size=f_size, strides=2, padding='same')(layer_input)
 		d = LeakyReLU(alpha=0.2)(d)
 		if bn:
@@ -247,7 +247,7 @@ def build_discriminator_1():
 	discriminator = Model([img_A, img_B], validity)
 	
 	
-	discriminator.compile(loss='mse', optimizer=Adam(lr=1e-4), metrics=['accuracy'])
+	discriminator.compile(loss='mse', optimizer=Adam(learning_rate=1e-4), metrics=['accuracy'])
 	return discriminator
 #######################CRNN CTC Recognize##########################
 def ctc_loss_lambda_func(y_true, y_pred):
@@ -315,16 +315,16 @@ def readGrayPair(im_name, split='train'):
 	original_image = Image.open(deg_image_path)  # /255.0
 	original_image = original_image.resize((1024,128), Image.LANCZOS)
 	grey_image = original_image.convert('L')
-	grey_image.save("deg_image2.png")
-	deg_image = plt.imread("deg_image2.png")
-	deg_image = plt.imread("deg_image2.png")
-	gt_image_path = os.path.join(DatabasePath, split, "images", im_name)
-	original_image = Image.open(gt_image_path)
+	
+	grey_image.save("deg_image2.jpg")
+	deg_image = plt.imread("deg_image2.jpg")
+	
+	gt_image_path = os.path.join(DatabasePath, split, 'images', im_name)
 	original_image = Image.open(gt_image_path)
 	original_image = original_image.resize((1024,128), Image.LANCZOS)
 	grey_image = original_image.convert('L')
-	grey_image.save("gt_image2.png")
-	gt_image = plt.imread("gt_image2.png")
+	grey_image.save("gt_image2.jpg")
+	gt_image = plt.imread("gt_image2.jpg")
 	
 	return deg_image, gt_image
   
@@ -342,7 +342,7 @@ def vconcat_resize(img_list, interpolation
     # return final image 
     return cv2.vconcat(im_list_resize) 	
  
-	###############New GAN######################
+###############New GAN######################
 def get_gan_network(discriminator_1,discriminator_2, generator, optimizer):
 	
 	discriminator_1.trainable = False
@@ -375,9 +375,14 @@ def encode_txt(text):
 	encoded=[]
 	cc=text.split()
 	for item in cc:
-		index = charset_base.index(item)
-	
-		encoded.append(index)
+		try:
+			index = charset_base.index(item.lower())
+			encoded.append(index)
+		except ValueError:
+			# Handle cases where a word is not in the charset, even after converting to lowercase
+			# For example, due to punctuation or special characters not in CHAR_LIST
+			# print(f"Warning: Word '{item}' not found in charset. Skipping.")
+			pass
 		
 	# encoded=encoded[::-1]  ############this is done only for arabic, otherwise remove this line
 
@@ -392,7 +397,7 @@ def train_gan(generator, discriminator_1,discriminator_2,gan,ep_start=0, epochs=
 	
 	# Build our GAN netowrks , 2 gans
 	#fc=codecs.open('histo.txt','w+','utf-8')
-	list_image_train = read_file_shuffle(rootPath + 'Sets/list_train_iam.txt')
+	list_image_train = read_file_shuffle(rootPath + 'Sets/list_train_nan.txt')
 	#res = list_image_train[-16:] 
 	res = list_image_train
 	list_lines = read_file(rootPath + 'Sets/lines.txt')
@@ -409,13 +414,34 @@ def train_gan(generator, discriminator_1,discriminator_2,gan,ep_start=0, epochs=
 		loss2=0
 		nbre_batch=0
 		
-		for im in tqdm(res):
+		for im_base in tqdm(res):
+			# Find the full filename with extension in the directory
+			search_pattern = os.path.join('datasets/nan_distorted/train', im_base + '.*')
+			found_files = glob(search_pattern)
+			
+			if not found_files:
+				# print(f"Warning: No image file found for base name {im_base} in train set. Skipping.")
+				continue
+			
+			im_full_name = os.path.basename(found_files[0])
+
 			###########read Grund truth text
-			matched_lines = [s for s in list_lines if im in s]
-			#print(matched_lines)
-			l = matched_lines[0]
-			l1 = l.split()
-			text_line = l1[8]
+			# Find the corresponding line in the transcription file
+			try:
+				line_text = next(s for s in list_lines if s.startswith(im_full_name))
+				
+				# Split the line into filename and transcription
+				parts = line_text.split(' ', 1)
+				if len(parts) == 2:
+					text_line = parts[1]
+				else:
+					# Handle cases where there might be no transcription
+					continue
+			except StopIteration:
+				# Handle cases where the image file has no matching transcription
+				# print(f"Warning: No transcription found for image {im_full_name}")
+				continue
+
 			line = normalizeTranscription(text_line)
 			len_trancription=len(line.split())
 			if len_trancription < max_text_length : ###########this conditioning the CRNN recognize 
@@ -424,14 +450,14 @@ def train_gan(generator, discriminator_1,discriminator_2,gan,ep_start=0, epochs=
 				batch_txt.append(line)
 				
 				########## read image pixels
-				deg_image, gt_image = readGrayPair(im)
+				deg_image, gt_image = readGrayPair(im_full_name)
 				#print('image found')
 				batch_train[batch, :, :, :] = deg_image.reshape(128,1024, 1)
 				batch_target[batch, :, :, :] = gt_image.reshape(128,1024, 1)
 				
-batch = batch + 1
+				batch = batch + 1
 				
-				batch_train_gt_path.append(DatabasePath + '/' + im + '.png')
+				batch_train_gt_path.append(os.path.join(DatabasePath, 'train', 'images', im_full_name))
 				if (batch == batch_size):
 						#print('Epoch: ', e, ' - Batch: ', nb)
 						generated_images = generator.predict(batch_train)
@@ -574,12 +600,9 @@ batch = batch + 1
 
 def save(gan, generator, discriminator_1,discriminator_2,epoch):
 
+	gan.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/gan_weights.h5")	
 	
-
-	
-	gan.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/gan_weights.h5")
-	
-discriminator_1.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/discriminator_weights.h5")
+	discriminator_1.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/discriminator_weights.h5")
 	discriminator_2.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/rcnn_weights.h5")
 	#discriminator_3.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/rcnn_progressive_weights.h5")
 	generator.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/generator_weights.h5")
@@ -597,18 +620,28 @@ def load(epoch):
 	gan = get_gan_network(discriminator_1,discriminator_2, generator, adam)
 	
 	#gan = gan.load_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/gan_weights.h5")
-	return gan, generator, discriminator_1,discriminator_2,discriminator_3
+	return gan, generator, discriminator_1,discriminator_2
 def evaluate(epoch, generator, discriminator_1,discriminator_2,gan):
 	
-	list_image_valid = read_file(rootPath + 'Sets/list_valid_iam.txt')
+	list_image_valid = read_file(rootPath + 'Sets/list_valid_nan.txt')
 	#res = list_image_valid[-2:] 
 	res = list_image_valid
 	list_lines = read_file(rootPath + 'Sets/lines.txt')
 	count_image=0
-	for im in res:
+	for im_base in res:
+		# Find the full filename with extension in the directory
+		search_pattern = os.path.join('datasets/nan_distorted/validation', im_base + '.*')
+		found_files = glob(search_pattern)
+		
+		if not found_files:
+			# print(f"Warning: No image file found for base name {im_base} in validation set. Skipping.")
+			continue
+		
+		im_full_name = os.path.basename(found_files[0])
+
 		if count_image >=0:
 			space = np.zeros((128,1024))
-			deg_image, gt_image = readGrayPair(im)
+			deg_image, gt_image = readGrayPair(im_full_name, split='validation')
 
 			prediction = generator.predict(deg_image.reshape(1, 128,1024, 1)).reshape(128,1024)
 			plt.imsave("prediction.png", prediction, cmap='gray')
@@ -623,8 +656,8 @@ def evaluate(epoch, generator, discriminator_1,discriminator_2,gan):
 		
 			if not os.path.exists(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch)):
 				os.makedirs(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch))
-					os.makedirs(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights")
-			cv2.imwrite(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + '/'+  im + ".png", show)
+				os.makedirs(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights")
+			cv2.imwrite(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + '/'+  im_full_name + ".png", show)
 	save(gan, generator, discriminator_1,discriminator_2,epoch)
 def train_GAN_crnn(nepochs,batch_size):
 	print('generator creation..............')
@@ -660,8 +693,7 @@ def loadCRNNModel(epoch,mode_crnn='no_progressive'):
 	from data.generator import DataGenerator
 	input_size = (1024, 128, 1)
 	dtgen = DataGenerator(source=source_path,
-					
-	batch_size=batch_size,
+						batch_size=batch_size,
 						charset=charset_base,
 						max_text_length=max_text_length)
 
@@ -711,16 +743,14 @@ def ocr_crnn(filename,dtgen,model):
 	return reco
 def predict_gan(epoch, generator,list_image_valid,set):
 	
-	
-
 	count_image=0
 	for im in list_image_valid:
 		if count_image >=0:
 
 			#deg_image, gt_image = readGrayPairPad(im)
-			original_path_image_gt=DatabasePath + '/' + im + '.png'
+			original_path_image_gt=os.path.join(DatabasePath, set, 'images', im)
 			claen_image=cv2.imread(original_path_image_gt)
-			noisy_image_path='datasets/iam_distorted/' + im + '.png'
+			noisy_image_path=os.path.join('datasets/nan_distorted/', set, im)
 			noisy_image=cv2.imread(noisy_image_path)
 			
 			#height, width,c = noisy_image.shape
@@ -732,52 +762,50 @@ def predict_gan(epoch, generator,list_image_valid,set):
 			#cv2.imwrite('out_padded.png',noisy_image)
 			##############end padding
 			
+			original_image = Image.open(noisy_image_path) 
+			original_image = original_image.resize((1024,128), Image.Resampling.LANCZOS)
 			
-			
-			
-	grey_image = original_image.convert('L')
-grey_image.save("deg_image3.png")
-deg_image = plt.imread("deg_image3.png")
+			grey_image = original_image.convert('L')
+			grey_image.save("deg_image3.png")
+			deg_image = plt.imread("deg_image3.png")
 			
 			prediction = generator.predict(deg_image.reshape(1, 128,1024, 1)).reshape(128,1024)
 			plt.imsave("prediction3.png", prediction, cmap='gray')
 			if not os.path.exists(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch)):
 				os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch))
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/prediction")
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/prediction_reduced")
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/visualize")
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/Truth")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/prediction")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/prediction_reduced")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/visualize")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/Truth")
 			################"resize predicted image to original size
 			cv2.imwrite(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + '/Truth/'+  im + ".png",claen_image)
 			original_image = Image.open('prediction3.png') 
 			original_image.save(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + '/prediction_reduced/'+  im + ".png")
 			########################""resizingggggggggg	
-			original_image = original_image.resize((width,height), Image.ANTIALIAS)
+			original_image = original_image.resize((width,height), Image.Resampling.LANCZOS)
 			original_image.save(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + '/prediction/'+  im + ".png")
 			# ######################space image
 			if not os.path.exists(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/Distorted"):
 				os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/Distorted")
 			
-			
 			original_image = Image.open(noisy_image_path) 
-			original_image = original_image.resize((1024,128), Image.ANTIALIAS)
+			original_image = original_image.resize((1024,128), Image.Resampling.LANCZOS)
 			original_image.save(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/Distorted/" + im + ".png")
 			
-			 
 		count_image=count_image+1
 def predict_gan_hard(epoch, generator,list_image_valid,set):
 	
 	
-	scenario='S_iam_OP'
+	scenario='S_nan_OP'
 
 	count_image=0
 	for im in list_image_valid:
 		if count_image >=0:
 
 			#deg_image, gt_image = readGrayPairPad(im)
-			original_path_image_gt=DatabasePath + '/' + im + '.png'
+			original_path_image_gt=os.path.join(DatabasePath, set, 'images', im)
 			claen_image=cv2.imread(original_path_image_gt)
-			noisy_image_path='datasets/iam_distorted/' + im + '.png'
+			noisy_image_path=os.path.join('datasets/nan_distorted/', set, im)
 			noisy_image=cv2.imread(noisy_image_path)
 			
 			#height, width,c = noisy_image.shape
@@ -789,13 +817,9 @@ def predict_gan_hard(epoch, generator,list_image_valid,set):
 			#cv2.imwrite('out_padded.png',noisy_image)
 			##############end padding
 			
-			
-			
-			
 			original_image = Image.open(noisy_image_path) 
-			original_image = original_image.resize((1024,128), Image.ANTIALIAS)
+			original_image = original_image.resize((1024,128), Image.Resampling.LANCZOS)
 
-		
 			grey_image = original_image.convert('L')
 			grey_image.save("deg_image3x.png")
 			deg_image = plt.imread("deg_image3x.png")
@@ -804,20 +828,19 @@ def predict_gan_hard(epoch, generator,list_image_valid,set):
 			plt.imsave("prediction3x.png", prediction, cmap='gray')
 			if not os.path.exists(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch)):
 				os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch))
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/prediction")
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/prediction_reduced")
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/visualize")
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/Truth")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/prediction")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/prediction_reduced")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/visualize")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/Truth")
 			################"resize predicted image to original size
 			#cv2.imwrite(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + '/Truth/'+  im + ".png",claen_image)
 			original_image = Image.open('prediction3x.png') 
 			#original_image.save(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + '/prediction_reduced/'+  im + ".png")
 			########################""resizingggggggggg	
-			original_image = original_image.resize((width,height), Image.ANTIALIAS)
+			original_image = original_image.resize((width,height), Image.Resampling.LANCZOS)
 			original_image.save(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + '/prediction/'+  im + ".png")
 			######################space image
 			
-			 
 		count_image=count_image+1
 def addpad_image(img):
 
@@ -851,14 +874,14 @@ def get_psnr_iam():
 	for im in list_image:
 		original_path_image_gt = DatabasePathGT + '/' + im + '.png'
 		original_image = Image.open(original_path_image_gt)
-		original_image = original_image.resize((1024,128), Image.ANTIALIAS)
+		original_image = original_image.resize((1024,128), Image.Resampling.LANCZOS)
 		grey_image = original_image.convert('1')
 		grey_image.save("gt.png")
 		gt = plt.imread("gt.png")
 
 		enhanced_image_path = 'handwritten-text-recognition/ResultGanS_iam_OP/hard3_set_test_epoch_112/prediction/'+  im + ".png"
 		im2 = Image.open(enhanced_image_path)
-		im2 = im2.resize((1024,128), Image.ANTIALIAS)
+		im2 = im2.resize((1024,128), Image.Resampling.LANCZOS)
 		im2 = im2.convert('1')
 		im2.save('im2.png')
 		predicted = plt.imread('im2.png')
@@ -870,9 +893,10 @@ def get_psnr_iam():
 	av = recap / qo
 	print('average psnr: ')
 	print(av)
-	if __name__ == '__main__':
+if __name__ == '__main__':
  
 	#############Train the GAN
 	train_GAN_crnn(150,8)
-	
- 
+	# epoch 150
+
+

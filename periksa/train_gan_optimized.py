@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.keras import *
 from tensorflow.keras.layers import *
+from tensorflow.keras.layers import LSTM, Bidirectional  # Explicit import for RNN layers
 from tensorflow.keras.optimizers import *
 from tensorflow.keras.callbacks import *
 from tensorflow.keras import backend as K
@@ -344,44 +345,73 @@ def discriminator_patch():
     return model
 
 def ctc_loss_lambda_func(y_true, y_pred):
-    """Optimized CTC loss"""
+    """Fixed CTC loss using simple approach"""
+    # Ensure y_true is 2D: (batch_size, max_label_length)
     if len(y_true.shape) > 2:
-        y_true = tf.squeeze(y_true)
-
-    input_length = tf.math.reduce_sum(y_pred, axis=2, keepdims=False)
-    input_length = tf.math.reduce_sum(input_length, axis=1, keepdims=True)
-
-    label_length = tf.math.reduce_sum(tf.cast(y_true, tf.float32), axis=1, keepdims=True)
-
-    loss = K.ctc_batch_cost(y_true, y_pred, input_length, label_length)
+        y_true = tf.squeeze(y_true, axis=-1)
+    
+    # Get shapes
+    batch_size = tf.shape(y_pred)[0]
+    time_steps = tf.shape(y_pred)[1]  # Should be 128 from CRNN
+    
+    # Convert y_true to int32
+    labels = tf.cast(y_true, tf.int32)
+    
+    # Create input_length: all samples have same time steps  
+    input_length = tf.fill([batch_size], time_steps)
+    
+    # Calculate label_length: count non-zero elements per sample
+    label_length = tf.reduce_sum(tf.cast(tf.not_equal(labels, 0), tf.int32), axis=1)
+    
+    # Use simple CTC loss approach - back to K.ctc_batch_cost but with proper casting
+    input_length = tf.cast(input_length, tf.float32)
+    label_length = tf.cast(label_length, tf.float32)
+    
+    # Expand dimensions to match expected shape in Keras CTC
+    input_length = tf.expand_dims(input_length, 1)  # (batch_size, 1)
+    label_length = tf.expand_dims(label_length, 1)  # (batch_size, 1)
+    
+    loss = K.ctc_batch_cost(labels, y_pred, input_length, label_length)
+    
+    # Handle NaN values
     loss = tf.where(tf.math.is_nan(loss), tf.zeros_like(loss), loss)
-
-    return loss
+    
+    return tf.reduce_mean(loss)
 
 def optimized_crnn_discriminator():
-    """Optimized CRNN discriminator"""
+    """Proper CRNN discriminator with temporal sequence output"""
     input_data = Input(name='input', shape=input_size_crnn, dtype='float32')
     
-    # CNN layers
+    # CNN feature extraction layers
     conv1 = Conv2D(64, (3, 3), activation='relu', padding='same')(input_data)
     conv1 = BatchNormalization()(conv1)
-    pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
+    pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)  # (512, 64, 64)
     
     conv2 = Conv2D(128, (3, 3), activation='relu', padding='same')(pool1)
     conv2 = BatchNormalization()(conv2)
-    pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
+    pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)  # (256, 32, 128)
     
-    # Reshape untuk RNN
-    new_shape = ((input_size_crnn[0] // 4), (input_size_crnn[1] // 4) * 128)
-    reshape = Reshape(target_shape=new_shape)(pool2)
+    conv3 = Conv2D(256, (3, 3), activation='relu', padding='same')(pool2)
+    conv3 = BatchNormalization()(conv3)
+    pool3 = MaxPooling2D(pool_size=(2, 1))(conv3)  # (128, 32, 256) - preserve width
     
-    # RNN layers
-    dense1 = Dense(256, activation='relu')(reshape)
+    conv4 = Conv2D(512, (3, 3), activation='relu', padding='same')(pool3)
+    conv4 = BatchNormalization()(conv4)
     
-    # Output layer
-    dense2 = Dense(len(charset_base) + 1, activation='softmax', name='dense2')(dense1)
+    # Reshape for RNN: (batch, width, height*channels) = (batch, 128, 32*512)
+    # This gives us 128 time steps for CTC
+    width = input_size_crnn[0] // 8  # 1024 // 8 = 128 time steps
+    features = (input_size_crnn[1] // 4) * 512  # (128 // 4) * 512 = 32 * 512 = 16384
+    reshape = Reshape(target_shape=(width, features))(conv4)
     
-    model = Model(inputs=input_data, outputs=dense2)
+    # RNN layers for temporal modeling
+    rnn1 = Bidirectional(LSTM(256, return_sequences=True, dropout=0.25))(reshape)
+    rnn2 = Bidirectional(LSTM(256, return_sequences=True, dropout=0.25))(rnn1)
+    
+    # Dense layer for character prediction
+    dense = Dense(len(charset_base) + 1, activation='softmax', name='dense2')(rnn2)
+    
+    model = Model(inputs=input_data, outputs=dense)
     return model
 
 def get_optimized_gan_network(discriminator_1, discriminator_2, generator, optimizer):
@@ -407,8 +437,15 @@ def get_optimized_gan_network(discriminator_1, discriminator_2, generator, optim
     
     return gan
 
-def optimized_train_gan(epochs=150, save_interval=10):
+def optimized_train_gan(epochs=150, save_interval=10, seed=42):
     """Optimized training function dengan multi-GPU"""
+    # Set seeds for reproducibility
+    import random
+    import numpy as np
+    random.seed(seed)
+    np.random.seed(seed)
+    tf.random.set_seed(seed)
+    
     print("=== OPTIMIZED GAN TRAINING ===")
     print(f"Global batch size: {GLOBAL_BATCH_SIZE}")
     print(f"Per-replica batch size: {PER_REPLICA_BATCH_SIZE}")
@@ -432,146 +469,116 @@ def optimized_train_gan(epochs=150, save_interval=10):
     # Distribute dataset
     train_dataset = strategy.experimental_distribute_dataset(train_dataset)
     
-    # Create models dalam strategy scope
+    # Create models & optimizers inside strategy scope
     with strategy.scope():
-        # Optimized learning rate untuk multi-GPU
         lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-            initial_learning_rate=2e-4 * strategy.num_replicas_in_sync,  # Scale dengan jumlah GPU
-            decay_steps=1000,
-            decay_rate=0.96,
+            initial_learning_rate=2e-4 * strategy.num_replicas_in_sync,
+            decay_steps=2000,
+            decay_rate=0.95,
             staircase=True
         )
-        
-        optimizer = Adam(learning_rate=lr_schedule, beta_1=0.5)
-        
         print("Creating models...")
         generator = unet_generator()
         discriminator_1 = discriminator_patch()
         discriminator_2 = optimized_crnn_discriminator()
-        
-        # Compile discriminators
-        discriminator_1.compile(
-            loss='mse', 
-            optimizer=Adam(learning_rate=lr_schedule), 
-            metrics=['accuracy']
-        )
-        
-        discriminator_2.compile(
-            loss=ctc_loss_lambda_func,
-            optimizer=Adam(learning_rate=lr_schedule)
-        )
-        
-        gan = get_optimized_gan_network(discriminator_1, discriminator_2, generator, optimizer)
-        
-        print("Models created and compiled!")
-    
-    # Setup callbacks
-    callbacks = [
-        ModelCheckpoint(
-            f"ResultGanS_{scenario}/epoch_{{epoch:03d}}/weights/generator.weights.h5",
-            save_weights_only=True,
-            save_freq='epoch',
-            verbose=1
-        ),
-        ReduceLROnPlateau(
-            monitor='loss',
-            factor=0.5,
-            patience=10,
-            min_lr=1e-7,
-            verbose=1
-        ),
-        CSVLogger(f"ResultGanS_{scenario}/training_log.csv")
-    ]
-    
-    # Training loop
-    print(f"Starting training for {epochs} epochs...")
-    
+        opt_g = tf.keras.optimizers.Adam(learning_rate=lr_schedule, beta_1=0.5)
+        opt_d1 = tf.keras.optimizers.Adam(learning_rate=lr_schedule, beta_1=0.5)
+        opt_d2 = tf.keras.optimizers.Adam(learning_rate=lr_schedule, beta_1=0.5)
+        mse = tf.keras.losses.MeanSquaredError()
+        bce = tf.keras.losses.BinaryCrossentropy()
+        print("Models created!")
+
+        @tf.function
+        def train_step(batch_data):
+            deg_images, gt_images, texts = batch_data
+            with tf.GradientTape(persistent=True) as tape:
+                # Forward pass
+                generated_images = generator(deg_images, training=True)
+                real_pred = discriminator_1([gt_images, deg_images], training=True)
+                fake_pred = discriminator_1([generated_images, deg_images], training=True)
+                reshaped_gen = tf.reshape(generated_images, (-1, 1024, 128, 1))
+                crnn_pred = discriminator_2(reshaped_gen, training=True)
+                # Targets
+                real_labels = tf.ones_like(real_pred)
+                fake_labels = tf.zeros_like(fake_pred)
+                # Discriminator 1 loss
+                d1_real_loss = mse(real_labels, real_pred)
+                d1_fake_loss = mse(fake_labels, fake_pred)
+                d1_loss = 0.5 * (d1_real_loss + d1_fake_loss)
+                # Generator losses
+                adv_loss = mse(real_labels, fake_pred)
+                recon_loss = bce(gt_images, generated_images)
+                ctc = ctc_loss_lambda_func(texts, crnn_pred)
+                g_total = adv_loss + 10.0 * recon_loss + ctc
+            # Gradients
+            grads_d1 = tape.gradient(d1_loss, discriminator_1.trainable_variables)
+            grads_d2 = tape.gradient(ctc, discriminator_2.trainable_variables)
+            grads_g = tape.gradient(g_total, generator.trainable_variables)
+            # Apply
+            opt_d1.apply_gradients(zip(grads_d1, discriminator_1.trainable_variables))
+            opt_d2.apply_gradients(zip(grads_d2, discriminator_2.trainable_variables))
+            opt_g.apply_gradients(zip(grads_g, generator.trainable_variables))
+            return d1_loss, g_total, ctc, recon_loss, adv_loss
+
+    # Metrics holders
+    d1_metric = tf.keras.metrics.Mean(name='d1_loss')
+    g_metric = tf.keras.metrics.Mean(name='g_loss')
+    ctc_metric = tf.keras.metrics.Mean(name='ctc_loss')
+    recon_metric = tf.keras.metrics.Mean(name='recon_loss')
+    adv_metric = tf.keras.metrics.Mean(name='adv_loss')
+
     for epoch in range(epochs):
         print(f"\n=== Epoch {epoch + 1}/{epochs} ===")
         start_time = time.time()
-        
-        # Training step
-        epoch_losses = []
-        batch_count = 0
-        
+        # Reset metrics
+        for m in [d1_metric, g_metric, ctc_metric, recon_metric, adv_metric]:
+            m.reset_state()
+        step = 0
         for batch_data in tqdm(train_dataset, desc=f"Epoch {epoch + 1}"):
-            deg_images, gt_images, texts = batch_data
-            
-            # Train discriminator 1
-            with strategy.scope():
-                # Generate fake images
-                generated_images = generator(deg_images, training=True)
-                
-                # Train discriminator 1
-                real_loss = discriminator_1.train_on_batch([gt_images, deg_images], 
-                                                         tf.ones_like(generated_images[:, :, :, :1]))
-                fake_loss = discriminator_1.train_on_batch([generated_images, deg_images], 
-                                                         tf.zeros_like(generated_images[:, :, :, :1]))
-                d1_loss = 0.5 * (real_loss[0] + fake_loss[0])
-                
-                # Train discriminator 2 (CRNN)
-                reshaped_gt = tf.reshape(gt_images, (-1, 1024, 128, 1))
-                reshaped_gen = tf.reshape(generated_images, (-1, 1024, 128, 1))
-                
-                d2_real_loss = discriminator_2.train_on_batch(reshaped_gt, texts)
-                d2_fake_loss = discriminator_2.train_on_batch(reshaped_gen, texts)
-                d2_loss = 0.5 * (d2_real_loss + d2_fake_loss)
-                
-                # Train generator
-                gan_loss = gan.train_on_batch(deg_images, [
-                    tf.ones_like(generated_images[:, :, :, :1]),  # Adversarial loss
-                    gt_images,  # Reconstruction loss
-                    texts  # Text recognition loss
-                ])
-                
-                epoch_losses.append({
-                    'd1_loss': d1_loss,
-                    'd2_loss': d2_loss,
-                    'gan_loss': gan_loss[0]
-                })
-            
-            batch_count += 1
-            if batch_count >= 100:  # Limit untuk demo
-                break
-        
-        # Print epoch statistics
-        avg_d1_loss = np.mean([l['d1_loss'] for l in epoch_losses])
-        avg_d2_loss = np.mean([l['d2_loss'] for l in epoch_losses])
-        avg_gan_loss = np.mean([l['gan_loss'] for l in epoch_losses])
-        
+            per_replica_losses = strategy.run(train_step, args=(batch_data,))
+            # Reduce
+            d1_l = strategy.reduce(tf.distribute.ReduceOp.MEAN, per_replica_losses[0], axis=None)
+            g_l = strategy.reduce(tf.distribute.ReduceOp.MEAN, per_replica_losses[1], axis=None)
+            ctc_l = strategy.reduce(tf.distribute.ReduceOp.MEAN, per_replica_losses[2], axis=None)
+            recon_l = strategy.reduce(tf.distribute.ReduceOp.MEAN, per_replica_losses[3], axis=None)
+            adv_l = strategy.reduce(tf.distribute.ReduceOp.MEAN, per_replica_losses[4], axis=None)
+            d1_metric.update_state(d1_l)
+            g_metric.update_state(g_l)
+            ctc_metric.update_state(ctc_l)
+            recon_metric.update_state(recon_l)
+            adv_metric.update_state(adv_l)
+            step += 1
         epoch_time = time.time() - start_time
-        
-        print(f"Epoch {epoch + 1} completed in {epoch_time:.2f}s")
-        print(f"  D1 Loss: {avg_d1_loss:.4f}")
-        print(f"  D2 Loss: {avg_d2_loss:.4f}")
-        print(f"  GAN Loss: {avg_gan_loss:.4f}")
-        
-        # Save models setiap save_interval
+        print(f"Epoch {epoch + 1} time: {epoch_time:.2f}s | D1: {d1_metric.result():.4f} | G: {g_metric.result():.4f} | Recon: {recon_metric.result():.4f} | Adv: {adv_metric.result():.4f} | CTC: {ctc_metric.result():.4f}")
         if (epoch + 1) % save_interval == 0:
             save_dir = f"ResultGanS_{scenario}/epoch_{epoch+1:03d}/weights"
             os.makedirs(save_dir, exist_ok=True)
-            
             generator.save_weights(f"{save_dir}/generator.weights.h5")
             discriminator_1.save_weights(f"{save_dir}/discriminator_1.weights.h5")
             discriminator_2.save_weights(f"{save_dir}/discriminator_2.weights.h5")
-            gan.save_weights(f"{save_dir}/gan.weights.h5")
-            
+            # Optionally export generator SavedModel
+            generator.save(f"{save_dir}/generator_saved_model", save_format='tf')
             print(f"Models saved at epoch {epoch + 1}")
     
     print("\n=== Training completed! ===")
     
     # Final save
     final_save_dir = f"ResultGanS_{scenario}/final/weights"
+    savedmodel_dir = f"ResultGanS_{scenario}/final/savedmodel"
     os.makedirs(final_save_dir, exist_ok=True)
+    os.makedirs(savedmodel_dir, exist_ok=True)
     
+    # Save weights
     generator.save_weights(f"{final_save_dir}/generator.weights.h5")
     discriminator_1.save_weights(f"{final_save_dir}/discriminator_1.weights.h5")
     discriminator_2.save_weights(f"{final_save_dir}/discriminator_2.weights.h5")
-    gan.save_weights(f"{final_save_dir}/gan.weights.h5")
     
-    print("Final models saved!")
+    # Save generator as SavedModel for deployment
+    generator.save(f"{savedmodel_dir}/generator")
     
-    return generator, discriminator_1, discriminator_2, gan
+    print("Final models saved (weights + SavedModel)!")
+    
+    return generator, discriminator_1, discriminator_2
 
 def main():
     """Main optimized training function"""

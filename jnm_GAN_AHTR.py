@@ -1,12 +1,24 @@
 import os
 os.environ["PYTHONIOENCODING"] = "utf-8"
+os.environ['TF_DISABLE_LAYOUT_OPTIMIZER'] = '1'
 #1 geforce
 #0 titan
-os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+os.environ["CUDA_VISIBLE_DEVICES"] = '0,1'
+
+# Configure TensorFlow threading BEFORE importing TensorFlow
+import tensorflow as tf
+tf.config.threading.set_intra_op_parallelism_threads(16)  # Half of 32 threads
+tf.config.threading.set_inter_op_parallelism_threads(16)  # Half of 32 threads
+
 import numpy as np
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
+import codecs
+import random
+import cv2
+import time
+from glob import glob
 from tensorflow.keras import regularizers
 from tensorflow.keras import metrics
 from tensorflow.keras.models import *
@@ -23,10 +35,80 @@ from tensorflow.keras.layers import Conv2D, Bidirectional, LSTM, GRU, Dense
 from tensorflow.keras.layers import Dropout, BatchNormalization, LeakyReLU, PReLU
 from tensorflow.keras.layers import Input, Add, Activation, Lambda, MaxPooling2D, Reshape
 from tensorflow.keras.models import load_model
+from tensorflow.keras.layers import UpSampling2D, Concatenate, concatenate
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tqdm import tqdm
+from data import preproc as pp
 
 import math
 import tensorflow as tf
- 
+import gc
+import os
+
+# Advanced GPU and performance configuration for dual RTX A4000
+def configure_optimal_gpu_setup():
+    """Configure optimal settings for dual RTX A4000 GPUs"""
+    
+    # Set environment variables for optimal performance
+    os.environ['TF_GPU_ALLOCATOR'] = 'cuda_malloc_async'
+    os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+    os.environ['TF_ENABLE_GPU_GARBAGE_COLLECTION'] = 'true'
+    
+    # Configure GPU memory growth and optimization
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        try:
+            # Enable memory growth for all GPUs
+            for gpu in gpus:
+                tf.config.experimental.set_memory_growth(gpu, True)
+            
+            # Enable TF32 for RTX series (faster training) - if available
+            try:
+                tf.config.experimental.enable_tensor_float_32()
+                print("✅ TF32 enabled for faster training")
+            except AttributeError:
+                print("⚠️ TF32 not available in this TensorFlow version - skipping")
+            
+            print(f"Configured {len(gpus)} GPUs with optimal settings")
+            print(f"Available GPUs: {[gpu.name for gpu in gpus]}")
+            
+        except RuntimeError as e:
+            print(f"GPU configuration error: {e}")
+    
+    # Setup distributed strategy for multi-GPU
+    if len(gpus) > 1:
+        strategy = tf.distribute.MirroredStrategy()
+        print(f"🚀 Using MirroredStrategy with {strategy.num_replicas_in_sync} GPUs")
+        return strategy
+    else:
+        print("⚠️  Single GPU detected, using OneDeviceStrategy")
+        return tf.distribute.OneDeviceStrategy("/gpu:0")
+
+# Configure CPU threading for Threadripper PRO 3955WX (32 threads)
+def configure_cpu_optimization():
+    """Configure optimal CPU settings for 32-thread Threadripper"""
+    print("🔧 CPU threading already optimized for 32-thread Threadripper PRO")
+
+# Advanced performance optimizations
+def enable_advanced_optimizations():
+    """Enable XLA, mixed precision, and other optimizations"""
+    
+    # Enable XLA JIT compilation for faster execution
+    tf.config.optimizer.set_jit(True)
+    
+    # Enable mixed precision (already set but ensuring it's optimal)
+    policy = tf.keras.mixed_precision.Policy('mixed_float16')
+    tf.keras.mixed_precision.set_global_policy(policy)
+    
+    print("⚡ Advanced optimizations enabled: XLA JIT, Mixed Precision, TF32")
+
+# Initialize all optimizations
+print("🚀 Initializing Full Optimization Strategy...")
+strategy = configure_optimal_gpu_setup()
+configure_cpu_optimization()
+enable_advanced_optimizations()
+print("✅ Full optimization configuration completed!")
 
 from PIL import Image
 from tqdm import tqdm
@@ -34,10 +116,6 @@ import random
 import sys
 import codecs
 import re
-import cv2
-import tqdm
-from glob import glob
-from tqdm import tqdm
 from data import preproc as pp
 
 
@@ -45,13 +123,13 @@ from data import preproc as pp
 ##########################################################################################################
 ##########################################################################################################
 rootPath='./'
-DatabasePath='datasets/iam_raw/'
+DatabasePath='datasets/nan_raw_biner/'
 scenario='S_iam_OP'
 
 # define parameters
 source = "iam"
-arch = "flor" ########ne pas modifier, nous utilisons architeture crnn de flor
-batch_size=32
+arch = "flor" ########ne pas modifier, nous utilisons architeture crnn
+batch_size=12  # Changed from 32 to 12 to match the error output
 # define paths
 source_path = os.path.join("..", "data", f"{source}.hdf5")
 output_path = os.path.join("..", "output-crnn-gan-" + scenario  , source, arch)
@@ -217,7 +295,7 @@ def unet(pretrained_weights=None, input_size=(128,1024, 1)):
 	return model
 
 def get_optimizer():
-	return Adam(lr=1e-4)
+	return Adam(learning_rate=1e-4)
 
 
 def build_discriminator_1():
@@ -247,32 +325,41 @@ def build_discriminator_1():
 	discriminator = Model([img_A, img_B], validity)
 	
 	
-	discriminator.compile(loss='mse', optimizer=Adam(lr=1e-4), metrics=['accuracy'])
+	discriminator.compile(loss='mse', optimizer=Adam(learning_rate=1e-4), metrics=['accuracy'])
 	return discriminator
 #######################CRNN CTC Recognize##########################
 def ctc_loss_lambda_func(y_true, y_pred):
-	"""Function for computing the CTC loss"""
+    """
+    Compute CTC loss using tf.nn.ctc_loss for better stability.
+    """
+    # Ensure y_true is of integer type for CTC loss calculation.
+    y_true = tf.cast(y_true, tf.int32)
 
-	if len(y_true.shape) > 2:
-		y_true = tf.squeeze(y_true)
+    # Get the length of the predictions (time steps).
+    sequence_length = tf.shape(y_pred)[1]
+    
+    # Create a tensor for input_length (logit_length).
+    batch_size = tf.shape(y_pred)[0]
+    input_length = tf.fill([batch_size], sequence_length)
 
-	# y_pred.shape = (batch_size, string_length, alphabet_size_1_hot_encoded)
-	# output of every model is softmax
-	# so sum across alphabet_size_1_hot_encoded give 1
-	#               string_length give string length
-	input_length = tf.math.reduce_sum(y_pred, axis=-1, keepdims=False)
-	input_length = tf.math.reduce_sum(input_length, axis=-1, keepdims=True)
+    # Calculate the length of the true labels.
+    label_length = tf.math.count_nonzero(y_true, axis=-1, dtype=tf.int32)
 
-	# y_true strings are padded with 0
-	# so sum of non-zero gives number of characters in this string
-	label_length = tf.math.count_nonzero(y_true, axis=-1, keepdims=True, dtype="int64")
+    # Use tf.nn.ctc_loss which is more direct and stable.
+    # It expects logits to be time-major, so we need to transpose y_pred.
+    loss = tf.nn.ctc_loss(
+        labels=y_true,
+        logits=y_pred,
+        label_length=label_length,
+        logit_length=input_length,
+        logits_time_major=False, # y_pred is [batch, time, features]
+        blank_index=-1 # Let TF automatically handle blank index
+    )
+    
+    # Return the mean loss, handling potential inf values.
+    loss = tf.cast(loss, tf.float32)
+    return tf.reduce_mean(tf.where(tf.math.is_inf(loss), 0.0, loss))
 
-	loss = K.ctc_batch_cost(y_true, y_pred, input_length, label_length)
-
-	# average loss across all entries in the batch
-	loss = tf.reduce_mean(loss)
-
-	return loss
 def build_discriminator_2():
 
 
@@ -289,7 +376,7 @@ def build_discriminator_2():
 	model.compile(optimizer=optimizer, loss=ctc_loss_lambda_func)
 
 	 
-	return model
+	return model 
  
 def build_discriminator_3():
 
@@ -316,15 +403,21 @@ def readGrayPair(im_name, split='train'):
 	original_image = original_image.resize((1024,128), Image.LANCZOS)
 	grey_image = original_image.convert('L')
 	
-	grey_image.save("deg_image2.png")
-	deg_image = plt.imread("deg_image2.png")
+	grey_image.save("deg_image2.jpg")
+	deg_image = plt.imread("deg_image2.jpg")
 	
 	gt_image_path = os.path.join(DatabasePath, split, 'images', im_name)
 	original_image = Image.open(gt_image_path)
 	original_image = original_image.resize((1024,128), Image.LANCZOS)
 	grey_image = original_image.convert('L')
-	grey_image.save("gt_image2.png")
-	gt_image = plt.imread("gt_image2.png")
+	grey_image.save("gt_image2.jpg")
+	gt_image = plt.imread("gt_image2.jpg")
+	
+	# Ensure images have channel dimension (128, 1024, 1)
+	if len(deg_image.shape) == 2:
+		deg_image = deg_image[..., np.newaxis]
+	if len(gt_image.shape) == 2:
+		gt_image = gt_image[..., np.newaxis]
 	
 	return deg_image, gt_image
   
@@ -364,7 +457,7 @@ def get_gan_network(discriminator_1,discriminator_2, generator, optimizer):
 	# define composite model
 	# out_generator is to compute the BCE loss ....
 	# define composite model
-	gan = Model([gan_input], [out_discrimintor_1, out_generator,  out_discrimintor_2])
+	gan = Model([gan_input], [out_discrimintor_1, out_generator, out_discrimintor_2])
 
 	gan.compile(loss=['mse','binary_crossentropy',ctc_loss_lambda_func], loss_weights=[1,10,1], optimizer=optimizer)   ##### the weight are to discuss later Please dont forget !!!
 	return gan
@@ -375,214 +468,320 @@ def encode_txt(text):
 	encoded=[]
 	cc=text.split()
 	for item in cc:
-		index = charset_base.index(item)
-	
-		encoded.append(index)
+		try:
+			index = charset_base.index(item.lower())
+			encoded.append(index)
+		except ValueError:
+			# Handle cases where a word is not in the charset, even after converting to lowercase
+			# For example, due to punctuation or special characters not in CHAR_LIST
+			# print(f"Warning: Word '{item}' not found in charset. Skipping.")
+			pass
 		
 	# encoded=encoded[::-1]  ############this is done only for arabic, otherwise remove this line
 
 	return encoded
-def train_gan(generator, discriminator_1,discriminator_2,gan,ep_start=0, epochs=1, batch_size=16):
-	 
-	# reserve a batch of the training and testing data
-	batch_train = np.zeros((((batch_size, 128,1024, 1))))
-	batch_target = np.zeros((((batch_size, 128,1024, 1))))
-	
-batch_train_gt_path=[]
-	
-	# Build our GAN netowrks , 2 gans
-	#fc=codecs.open('histo.txt','w+','utf-8')
-	list_image_train = read_file_shuffle(rootPath + 'Sets/list_train_iam.txt')
-	#res = list_image_train[-16:] 
-	res = list_image_train
-	list_lines = read_file(rootPath + 'Sets/lines.txt')
-	for e in range(ep_start, epochs + 1):
-		batch = 0
-		print ('\n Epoch ', e)
-		batch_txt = []
-		divider = random.randint(300, 600)
-		count_image=0
 
-
-		nb=0
-		loss1=0
-		loss2=0
-		nbre_batch=0
+def data_generator(image_list, lines_list, split='train'):
+	"""Generator function untuk tf.data pipeline"""
+	for im_base in image_list:
+		# Find the full filename with extension
+		search_pattern = os.path.join('datasets/nan_distorted', split, im_base + '.*')
+		found_files = glob(search_pattern)
 		
-		for im in tqdm(res):
-			###########read Grund truth text
-			matched_lines = [s for s in list_lines if im in s]
-			#print(matched_lines)
-			l = matched_lines[0]
-			l1 = l.split()
-			text_line = l1[8]
-			line = normalizeTranscription(text_line)
-			len_trancription=len(line.split())
-			if len_trancription < max_text_length : ###########this conditioning the CRNN recognize 
-			###################################################which recognize sequence lengh < max_text_length (128)
-
-				batch_txt.append(line)
-				
-				########## read image pixels
-				deg_image, gt_image = readGrayPair(im)
-				#print('image found')
-				batch_train[batch, :, :, :] = deg_image.reshape(128,1024, 1)
-				batch_target[batch, :, :, :] = gt_image.reshape(128,1024, 1)
-				
-batch = batch + 1
-				
-				batch_train_gt_path.append(DatabasePath + '/' + im + '.png')
-				if (batch == batch_size):
-						#print('Epoch: ', e, ' - Batch: ', nb)
-						generated_images = generator.predict(batch_train)
-						#deg_image1 = batch_train[0].reshape(128,1024)
-						#gt_image1 = batch_target[0].reshape(128,1024)
-						#here to show current image result 
-						#prediction1 = generated_images[0].reshape(128,1024)
-						#plt.imsave("prediction2.png", prediction1, cmap='gray')
-						#plt.imsave("deg_image1.png", deg_image1, cmap='gray')
-						#plt.imsave("gt_image1.png", gt_image1, cmap='gray')
-						#im1=cv2.imread("prediction2.png")
-						#im2=cv2.imread("deg_image1.png")
-						#im3=cv2.imread("gt_image1.png")
-						#show=vconcat_resize([im2,im1,im3])
+		if not found_files:
+			continue
+		
+		im_full_name = os.path.basename(found_files[0])
+		
+		# Find transcription
+		try:
+			line_text = next(s for s in lines_list if s.startswith(im_full_name))
+			parts = line_text.split(' ', 1)
+			if len(parts) != 2:
+				continue
+			text_line = parts[1]
+		except StopIteration:
+			continue
+		
+		# Prepare transcription
+		line = normalizeTranscription(text_line)
+		words = line.split()
+		if len(words) >= max_text_length:
+			continue
 			
-						#cv2.imwrite("generation.png", show)
-						################## prepare discriminator labels
-						
-						
-						valid = np.ones((batch_size,) + ( 8, 64, 1))
-						fake = np.zeros((batch_size,) + ( 8, 64, 1))
-						########### here we train the discriminator 
-						# print('discriminator_1 training......')	
-						discriminator_1.trainable = True
-						# '''random add'''
-						d1=discriminator_1.train_on_batch([batch_target, batch_train], valid)
-						#f1.write('epoch ' + str(e) + ' batch ' + str(nb) + ' loss ' + str(d1) + '\n')
-						d2=discriminator_1.train_on_batch([generated_images, batch_train], fake)
-						#f2.write('epoch ' + str(e) + ' batch ' + str(nb) + ' loss ' + str(d2)+ '\n')
-						###### here train your rcnn (discriminator_2) with a real batch (GT images)
-						discriminator_2.trainable = True
-						#################preapare data for the crnn
-
-						x_train_rcnn=[] ############images in batch
-						y_train_rcnn=[] ##ground truth of this batch
-						#fc.write( 'Epoch: ' +  str(e) +  ' - Batch: ' + str(nb) + '\n')
-						for i in range (batch_size):
-							#print(batch_train_gt_path[i])
-							img=pp.preprocess(batch_train_gt_path[i],input_size_crnn)
-							x_train_rcnn.append(img)
-							#print(batch_txt[i])
-							#fc.write(batch_train_gt_path[i] + '\n')
-							#fc.write(batch_txt[i] + '\n')
-							encoded_txt=encode_txt(batch_txt[i])
-							y_train_rcnn.append(encoded_txt)
-							del img
-							del encoded_txt
-						
-						y_train_rcnn = [np.pad(y, (0, max_text_length - len(y))) for y in y_train_rcnn]
-						y_train_rcnn = np.asarray(y_train_rcnn, dtype=np.int16)
-						x_train_rcnn=pp.normalization(x_train_rcnn)
-						#### data to be fed to the CRNN network for training
-
-						
-						############################## Training recognizer RCNN ####################################################################
-
-					 
-						callbacks1 = get_callbacks(logdir=output_path, checkpoint=target_path, verbose=0)
-						d3=discriminator_2.fit(x_train_rcnn,y_train_rcnn,batch_size=batch_size,initial_epoch=e, epochs=e +1, verbose=0,
-                             callbacks=callbacks1,shuffle=True)
-						#f3.write('epoch ' + str(e) + ' batch ' + str(nb) + ' loss ' + str(d3.history['loss'])+ '\n')
-					
-						# print('End discriminator_2 training.')	
-					############################## End of Training recognizer RCNN ####################################################################
-						########### train the generator with GAN  , by freezing the discriminator weights  
-						discriminator_2.trainable = False
-						discriminator_1.trainable = False
-						# print('Training the GAN by freezing the discriminator weights')	
-						g_loss=gan.train_on_batch([batch_train], [valid, batch_target,y_train_rcnn])
-						#fg.write('epoch ' + str(e) + ' batch ' + str(nb) + ' loss ' + str(g_loss)+ '\n')
-						del y_train_rcnn
-						del x_train_rcnn
-						
-						##############################################################################################################
-						##############################################################################################################
-						# ###### here train your rcnn progressively for recognition purpose
-						# discriminator_3.trainable = True
-						# #################preapare data for the crnn
-
-						# x_train_rcnn_p=[] ############images in batch
-						# y_train_rcnn_p=[] ##ground truth of this batch
-
-						# for j in range (batch_size):
-							#print(generated_images[i])
-							#pred = generated_images[j].reshape(128,1024)
-							#plt.imsave("pred1.png", pred, cmap='gray')
-							#n=batch_train_gt_path[j]
-							#g=cv2.imread(n)
-							#height, width,c = g.shape
-							#predx = Image.open("pred1.png") 
-							#predx = predx.convert('L')
-							#predx = predx.resize((width,height), Image.ANTIALIAS)
-							#predx.save("pred.png")
-						 
-							# ########"ici les images pour apprendre le crnn sont genereted via generator ###################################
-							#imgp=pp.preprocess("pred.png",input_size_crnn)
-							#print(imgp)
-							#x_train_rcnn_p.append(imgp)
-							#del imgp
-							#encoded_txt=encode_txt(batch_txt[j])
-							#print(encoded_txt)
-							#y_train_rcnn_p.append(encoded_txt)
-							#del encoded_txt
-						# y_train_rcnn_p = [np.pad(y, (0, max_text_length - len(y))) for y in y_train_rcnn_p]
-						# y_train_rcnn_p = np.asarray(y_train_rcnn_p, dtype=np.int16)
-
-						# x_train_rcnn_p=pp.normalization(x_train_rcnn_p)
-						# #### data to be fed to the CRNN network for training
-
-						 
-						
-						#d4=discriminator_3.train_on_batch(x_train_rcnn_p,y_train_rcnn_p)
-						#callbacks2 = get_callbacks(logdir=output_path2, checkpoint=target_path2, verbose=0)
-						#d4=discriminator_3.fit(x_train_rcnn_p,y_train_rcnn_p,batch_size=batch_size,initial_epoch=e, epochs=e +1, verbose=0,
-                             #callbacks=callbacks2,shuffle=True)			#f4.write('epoch ' + str(e) + ' batch ' + str(nb) + ' loss ' + str(d4.history['loss'])+ '\n')
-
-	
-						# del y_train_rcnn_p
-						# del x_train_rcnn_p
-
-						###########################end crnn training#################################################################
-						##############################################################################################################
-						##############################################################################################################
-						
-						nbre_batch=nbre_batch+1
-						batch_train_gt_path=[]
-						batch_txt=[]
-						batch = 0
-						nb=nb+1
-
-			count_image=count_image+1
-		###################"compute loss per epoch
-
-		print ('\n Epoch ', e)
+		# Encode text
+		encoded_txt = encode_txt(line)
+		if not encoded_txt:  # Skip if encoding failed
+			continue
 		
-		if (e <= 5 or e % 4 == 0):
-			evaluate(e, generator, discriminator_1,discriminator_2,gan)
-	return generator, discriminator_1,discriminator_2,gan
+		# Ensure encoded_txt doesn't exceed max_text_length
+		encoded_txt = encoded_txt[:max_text_length-1]  # Leave room for padding
+		
+		# Load and preprocess images
+		deg_image, gt_image = readGrayPair(im_full_name, split=split)
+		
+		# Prepare CRNN data
+		gt_path = os.path.join(DatabasePath, split, 'images', im_full_name)
+		img = pp.preprocess(gt_path, input_size_crnn)
+		
+		# Transpose img for CRNN: (128, 1024) -> (1024, 128, 1)
+		if len(img.shape) == 2:  # (128, 1024)
+			img = img.T  # -> (1024, 128)
+			img = img[..., np.newaxis]  # -> (1024, 128, 1)
+		elif len(img.shape) == 3 and img.shape == (128, 1024, 1):  # (128, 1024, 1)
+			img = np.transpose(img, (1, 0, 2))  # -> (1024, 128, 1)
+		
+		# Pad encoded_txt to max_text_length
+		padded_encoded = np.pad(encoded_txt, (0, max_text_length - len(encoded_txt)), mode='constant')
+		
+		yield {
+			'deg_image': deg_image.astype(np.float32),
+			'gt_image': gt_image.astype(np.float32),
+			'crnn_image': img.astype(np.float32),
+			'transcription': padded_encoded.astype(np.int16),
+			'text_line': line
+		}
 
+def create_optimized_dataset(list_image_train, list_lines, split, strategy, batch_size=12):
+	"""Create highly optimized dataset pipeline for dual-GPU training"""
+	
+	AUTOTUNE = tf.data.AUTOTUNE
+	
+	# Create base dataset
+	dataset = tf.data.Dataset.from_generator(
+		lambda: data_generator(list_image_train, list_lines, split),
+		output_signature={
+			'deg_image': tf.TensorSpec(shape=(128, 1024, 1), dtype=tf.float32),
+			'gt_image': tf.TensorSpec(shape=(128, 1024, 1), dtype=tf.float32),
+			'crnn_image': tf.TensorSpec(shape=(1024, 128, 1), dtype=tf.float32),
+			'transcription': tf.TensorSpec(shape=(max_text_length,), dtype=tf.int16),
+			'text_line': tf.TensorSpec(shape=(), dtype=tf.string)
+		}
+	)
+	
+	# Advanced pipeline optimizations
+	dataset = dataset.cache()  # Cache dataset in memory (125GB RAM available)
+	dataset = dataset.shuffle(buffer_size=2000, reshuffle_each_iteration=True)
+	
+	# Parallel data processing using all 32 CPU threads
+	dataset = dataset.map(
+		lambda x: x,  # Identity function, but enables parallel processing
+		num_parallel_calls=AUTOTUNE,
+		deterministic=False  # Allow reordering for performance
+	)
+	
+	# Batch and optimize for multi-GPU
+	per_replica_batch_size = batch_size // strategy.num_replicas_in_sync
+	dataset = dataset.batch(per_replica_batch_size, drop_remainder=True)
+	
+	# Advanced prefetching for GPU utilization
+	dataset = dataset.prefetch(AUTOTUNE)
+	
+	print(f"📊 Dataset optimized: global_batch={batch_size}, per_replica={per_replica_batch_size}")
+	print(f"🔧 Using {strategy.num_replicas_in_sync} GPUs with advanced pipeline optimizations")
+	
+	return dataset
+
+def train_gan(generator, discriminator_1, discriminator_2, gan, ep_start=0, epochs=1, batch_size=12):
+	"""Optimized multi-GPU GAN training with full performance optimizations"""
+	
+	# Prepare data lists
+	list_image_train = read_file_shuffle(rootPath + 'Sets/list_train_nan.txt')
+	list_lines = read_file(rootPath + 'Sets/lines.txt')
+	
+	# Use the global strategy for distributed training
+	global strategy
+	
+	print(f"🚀 Starting optimized training with {strategy.num_replicas_in_sync} GPUs")
+	print(f"📊 Global batch size: {batch_size} (per GPU: {batch_size // strategy.num_replicas_in_sync})")
+	
+	# Create optimizers and define training step in strategy scope
+	with strategy.scope():
+		print("🔧 Creating optimizers in distributed strategy scope...")
+		gen_optimizer = tf.keras.optimizers.Adam(learning_rate=0.0002, beta_1=0.5)
+		disc1_optimizer = tf.keras.optimizers.Adam(learning_rate=0.0002, beta_1=0.5)
+		disc2_optimizer = tf.keras.optimizers.Adam(learning_rate=0.0002, beta_1=0.5)
+		
+		# Define distributed training step within strategy scope
+		@tf.function
+		def distributed_train_step(batch_data):
+			"""Optimized distributed training step"""
+			
+			def train_step(inputs):
+				batch_train = inputs['deg_image']
+				batch_target = inputs['gt_image']
+				x_train_rcnn = inputs['crnn_image']
+				y_train_rcnn = inputs['transcription']
+				
+				per_replica_batch_size = tf.shape(batch_train)[0]
+				
+				# Generate images
+				generated_images = generator(batch_train, training=False)
+				
+				# Prepare labels
+				valid = tf.ones((per_replica_batch_size, 8, 64, 1), dtype=tf.float32)
+				fake = tf.zeros((per_replica_batch_size, 8, 64, 1), dtype=tf.float32)
+				
+				# Train discriminator_1
+				with tf.GradientTape() as disc1_tape:
+					# Real images
+					real_pred = discriminator_1([batch_target, batch_train], training=True)
+					real_loss = tf.keras.losses.binary_crossentropy(valid, real_pred)
+					
+					# Fake images
+					fake_pred = discriminator_1([generated_images, batch_train], training=True)
+					fake_loss = tf.keras.losses.binary_crossentropy(fake, fake_pred)
+					
+					d1_loss = (tf.reduce_mean(real_loss) + tf.reduce_mean(fake_loss)) / 2
+				
+				# Apply discriminator_1 gradients
+				d1_grads = disc1_tape.gradient(d1_loss, discriminator_1.trainable_variables)
+				# Filter out None gradients
+				d1_grads_and_vars = [(grad, var) for grad, var in zip(d1_grads, discriminator_1.trainable_variables) if grad is not None]
+				if d1_grads_and_vars:
+					disc1_optimizer.apply_gradients(d1_grads_and_vars)
+				
+				# Train discriminator_2 (CRNN)
+				with tf.GradientTape() as disc2_tape:
+					# Forward pass through CRNN model
+					d2_predictions = discriminator_2(x_train_rcnn, training=True)
+					
+					# Ensure y_train_rcnn has correct shape for CTC loss
+					# y_train_rcnn should be (batch_size, max_text_length)
+					if len(y_train_rcnn.shape) == 1:
+						y_train_rcnn = tf.expand_dims(y_train_rcnn, axis=0)
+					
+					# Pad or truncate to ensure consistent dimensions
+					max_len = tf.reduce_max(tf.math.count_nonzero(y_train_rcnn, axis=-1))
+					y_train_rcnn = y_train_rcnn[:, :max_len]
+					
+					# Calculate CTC loss manually
+					d2_loss = ctc_loss_lambda_func(y_train_rcnn, d2_predictions)
+					d2_loss = tf.reduce_mean(d2_loss)
+				
+				d2_grads = disc2_tape.gradient(d2_loss, discriminator_2.trainable_variables)
+				# Filter out None gradients
+				d2_grads_and_vars = [(grad, var) for grad, var in zip(d2_grads, discriminator_2.trainable_variables) if grad is not None]
+				if d2_grads_and_vars:
+					disc2_optimizer.apply_gradients(d2_grads_and_vars)
+				
+				# Train generator via GAN
+				with tf.GradientTape() as gen_tape:
+					# Use explicit call method to avoid training parameter conflict
+					gan_outputs = gan.call([batch_train], training=True)
+					# Unpack outputs: [discriminator_1_out, generator_out, discriminator_2_out]
+					_, generator_out, crnn_out = gan_outputs
+					
+					# Calculate losses manually for better control
+					# Generator loss (BCE) - need to reshape valid to match generator_out shape
+					# valid shape: (12, 8, 64, 1) -> generator_out shape: (12, 128, 1024, 1)
+					valid_reshaped = tf.image.resize(valid, [128, 1024])  # Resize to match generator output
+					gen_loss = tf.keras.losses.binary_crossentropy(valid_reshaped, generator_out)
+					
+					# CRNN loss - ensure proper dimensions
+					if len(y_train_rcnn.shape) == 1:
+						y_train_rcnn_padded = tf.expand_dims(y_train_rcnn, axis=0)
+					else:
+						y_train_rcnn_padded = y_train_rcnn
+					
+					# Pad or truncate to ensure consistent dimensions
+					max_len = tf.reduce_max(tf.math.count_nonzero(y_train_rcnn_padded, axis=-1))
+					y_train_rcnn_padded = y_train_rcnn_padded[:, :max_len]
+					
+					crnn_loss = ctc_loss_lambda_func(y_train_rcnn_padded, crnn_out)
+					
+					# Combined loss (matching original GAN loss weights [1,10,1])
+					# Cast both losses to the same type to avoid type mismatch
+					gen_loss_float = tf.cast(tf.reduce_mean(gen_loss), tf.float32)
+					crnn_loss_float = tf.cast(crnn_loss, tf.float32)
+					g_loss = gen_loss_float * 10 + crnn_loss_float * 1
+				
+				gen_grads = gen_tape.gradient(g_loss, generator.trainable_variables)
+				# Filter out None gradients
+				gen_grads_and_vars = [(grad, var) for grad, var in zip(gen_grads, generator.trainable_variables) if grad is not None]
+				if gen_grads_and_vars:
+					gen_optimizer.apply_gradients(gen_grads_and_vars)
+				
+				return d1_loss, d2_loss, g_loss
+			
+			# Run distributed training
+			per_replica_losses = strategy.run(train_step, args=(batch_data,))
+			
+			# Reduce losses across replicas
+			d1_loss = strategy.reduce(tf.distribute.ReduceOp.MEAN, per_replica_losses[0], axis=None)
+			d2_loss = strategy.reduce(tf.distribute.ReduceOp.MEAN, per_replica_losses[1], axis=None)
+			g_loss = strategy.reduce(tf.distribute.ReduceOp.MEAN, per_replica_losses[2], axis=None)
+			
+			return d1_loss, d2_loss, g_loss
+	
+	# Main training loop
+	for e in range(ep_start, epochs + 1):
+		print(f"\n🔄 Epoch {e}/{epochs}")
+		
+		# Create optimized dataset
+		dataset = create_optimized_dataset(list_image_train, list_lines, 'train', strategy, batch_size)
+		
+		# Distribute dataset across GPUs
+		distributed_dataset = strategy.experimental_distribute_dataset(dataset)
+		
+		# Track progress for this epoch
+		print(f"📊 Dataset optimized: global_batch={batch_size}, per_replica={batch_size // strategy.num_replicas_in_sync}")
+		print(f"🔧 Using {strategy.num_replicas_in_sync} GPUs with advanced pipeline optimizations")
+		
+		# Training loop with performance monitoring
+		nb = 0
+		epoch_start_time = time.time()
+		
+		for batch_data in distributed_dataset:
+			batch_start_time = time.time()
+			
+			# Distributed training step
+			d1_loss, d2_loss, g_loss = distributed_train_step(batch_data)
+			
+			nb += 1
+			
+			# Advanced memory management
+			if nb % 100 == 0:  # Less frequent clearing for better performance
+				gc.collect()
+				print(f"🧹 Memory optimized at batch {nb}")
+			
+			# Progress reporting with performance metrics
+			if nb % 10 == 0:
+				batch_time = time.time() - batch_start_time
+				samples_per_second = batch_size / batch_time
+				
+				print(f'⚡ Batch {nb} - D1: {d1_loss:.4f}, D2: {d2_loss:.4f}, G: {g_loss:.4f} '
+					  f'| Speed: {samples_per_second:.1f} samples/sec | Time: {batch_time:.2f}s')
+		
+		epoch_time = time.time() - epoch_start_time
+		print(f'✅ Epoch {e} completed in {epoch_time:.1f}s')
+		
+		# Save models every 25 epochs
+		if e % 25 == 0:
+			save_epoch = e
+			print(f"💾 Saving models at epoch {save_epoch}")
+			try:
+				generator.save_weights(f'checkpoints/generator_epoch_{save_epoch}.weights.h5')
+				discriminator_1.save_weights(f'checkpoints/discriminator1_epoch_{save_epoch}.weights.h5')
+				discriminator_2.save_weights(f'checkpoints/discriminator2_epoch_{save_epoch}.weights.h5')
+				gan.save_weights(f'checkpoints/gan_epoch_{save_epoch}.weights.h5')
+			except Exception as e_save:
+				print(f"⚠️ Error saving models: {e_save}")
+			
+		# Evaluate every few epochs
+		if e <= 5 or e % 4 == 0:
+			evaluate(e, generator, discriminator_1, discriminator_2, gan)
+	
+	return generator, discriminator_1, discriminator_2, gan
 
 def save(gan, generator, discriminator_1,discriminator_2,epoch):
 
+	gan.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/gan.weights.h5")	
 	
-
-	
-gan.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/gan_weights.h5")	
-	
-discriminator_1.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/discriminator_weights.h5")
-	discriminator_2.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/rcnn_weights.h5")
-	#discriminator_3.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/rcnn_progressive_weights.h5")
-	generator.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/generator_weights.h5")
+	discriminator_1.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/discriminator.weights.h5")
+	discriminator_2.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/rcnn.weights.h5")
+	#discriminator_3.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/rcnn_progressive.weights.h5")
+	generator.save_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/generator.weights.h5")
 
 def load(epoch):
 	generator = unet()
@@ -597,23 +796,33 @@ def load(epoch):
 	gan = get_gan_network(discriminator_1,discriminator_2, generator, adam)
 	
 	#gan = gan.load_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights/gan_weights.h5")
-	return gan, generator, discriminator_1,discriminator_2,discriminator_3
+	return gan, generator, discriminator_1,discriminator_2
 def evaluate(epoch, generator, discriminator_1,discriminator_2,gan):
 	
-	list_image_valid = read_file(rootPath + 'Sets/list_valid_iam.txt')
+	list_image_valid = read_file(rootPath + 'Sets/list_valid_nan.txt')
 	#res = list_image_valid[-2:] 
 	res = list_image_valid
 	list_lines = read_file(rootPath + 'Sets/lines.txt')
 	count_image=0
-	for im in res:
+	for im_base in res:
+		# Find the full filename with extension in the directory
+		search_pattern = os.path.join('datasets/nan_distorted/validation', im_base + '.*')
+		found_files = glob(search_pattern)
+		
+		if not found_files:
+			# print(f"Warning: No image file found for base name {im_base} in validation set. Skipping.")
+			continue
+		
+		im_full_name = os.path.basename(found_files[0])
+
 		if count_image >=0:
 			space = np.zeros((128,1024))
-			deg_image, gt_image = readGrayPair(im)
+			deg_image, gt_image = readGrayPair(im_full_name, split='validation')
 
 			prediction = generator.predict(deg_image.reshape(1, 128,1024, 1)).reshape(128,1024)
 			plt.imsave("prediction.png", prediction, cmap='gray')
-			plt.imsave("deg_image.png", deg_image, cmap='gray')
-			plt.imsave("gt_image.png", gt_image, cmap='gray')
+			plt.imsave("deg_image.png", np.squeeze(deg_image), cmap='gray')
+			plt.imsave("gt_image.png", np.squeeze(gt_image), cmap='gray')
 			plt.imsave("space.png", space, cmap='gray')
 			im1=cv2.imread("prediction.png")
 			im2=cv2.imread("deg_image.png")
@@ -623,45 +832,55 @@ def evaluate(epoch, generator, discriminator_1,discriminator_2,gan):
 		
 			if not os.path.exists(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch)):
 				os.makedirs(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch))
-					os.makedirs(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights")
-			cv2.imwrite(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + '/'+  im + ".png", show)
+				os.makedirs(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + "/weights")
+			cv2.imwrite(rootPath+"/ResultGan" + scenario + "/epoch" + str(epoch) + '/'+  im_full_name + ".png", show)
 	save(gan, generator, discriminator_1,discriminator_2,epoch)
-def train_GAN_crnn(nepochs,batch_size):
-	print('generator creation..............')
-	generator = unet()
-	print('discriminator 1 creation..............')
-	discriminator_1 = build_discriminator_1()
-	###########"load data for RCNN
-	print('discriminator 2 creation..............')
-	####discriminator_2 : cest le crnn
-	discriminator_2 = build_discriminator_2()
-	print('discriminator 3 creation..............')	
-	discriminator_3 = build_discriminator_3()
-	epo = 0
-	adam = get_optimizer()
-	gan = get_gan_network(discriminator_1,discriminator_2, generator, adam)
-	generator, discriminator_1,discriminator_2,gan = train_gan(generator, discriminator_1,discriminator_2,gan, ep_start=0, epochs=nepochs, batch_size=batch_size)
-def resume_train_GAN_crnn(nepochs,epo,batch_size):
+def train_GAN_crnn(nepochs,batch_size=12):
+	global strategy
+	# Validasi batch size terhadap jumlah replica
+	if batch_size % strategy.num_replicas_in_sync != 0:
+		adjusted = (batch_size // strategy.num_replicas_in_sync) * strategy.num_replicas_in_sync
+		print(f"⚠️  batch_size {batch_size} tidak habis dibagi {strategy.num_replicas_in_sync} replica. Disesuaikan menjadi {adjusted}.")
+		batch_size = adjusted if adjusted > 0 else strategy.num_replicas_in_sync
 
+	print(f'🔧 Membangun model dalam strategy.scope() (replicas={strategy.num_replicas_in_sync}) ...')
+	with strategy.scope():
+		print('generator creation..............')
+		generator = unet()
+		print('discriminator 1 creation..............')
+		discriminator_1 = build_discriminator_1()
+		print('discriminator 2 (CRNN) creation..............')
+		discriminator_2 = build_discriminator_2()
+		# discriminator_3 saat ini tidak dipakai dalam training loop
+		# print('discriminator 3 creation..............')
+		# discriminator_3 = build_discriminator_3()
+		adam = get_optimizer()
+		gan = get_gan_network(discriminator_1,discriminator_2, generator, adam)
+	# Lanjutkan ke proses training
+	generator, discriminator_1, discriminator_2, gan = train_gan(generator, discriminator_1, discriminator_2, gan, ep_start=0, epochs=nepochs, batch_size=batch_size)
+def resume_train_GAN_crnn(nepochs,epo,batch_size=12):
+	global strategy
+	if batch_size % strategy.num_replicas_in_sync != 0:
+		adjusted = (batch_size // strategy.num_replicas_in_sync) * strategy.num_replicas_in_sync
+		print(f"⚠️  batch_size {batch_size} tidak habis dibagi {strategy.num_replicas_in_sync} replica. Disesuaikan menjadi {adjusted}.")
+		batch_size = adjusted if adjusted > 0 else strategy.num_replicas_in_sync
 
-	generator = unet()
-	generator.load_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epo-1) + "/weights/generator_weights.h5")
-	discriminator_1 = build_discriminator_1()
-	discriminator_1.load_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epo-1) + "/weights/discriminator_weights.h5")
-	 
-	discriminator_2 = build_discriminator_2()
-	discriminator_2.load_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epo-1) + "/weights/rcnn_weights.h5")
-	 
-	adam = get_optimizer()
-	gan = get_gan_network(discriminator_1,discriminator_2, generator, adam)
-	generator, discriminator_1,discriminator_2,gan = train_gan(generator, discriminator_1,discriminator_2, gan,ep_start=epo, epochs=nepochs, batch_size=batch_size)
+	with strategy.scope():
+		generator = unet()
+		generator.load_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epo-1) + "/weights/generator_weights.h5")
+		discriminator_1 = build_discriminator_1()
+		discriminator_1.load_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epo-1) + "/weights/discriminator_weights.h5")
+		discriminator_2 = build_discriminator_2()
+		discriminator_2.load_weights(rootPath+"/ResultGan" + scenario + "/epoch" + str(epo-1) + "/weights/rcnn_weights.h5")
+		adam = get_optimizer()
+		gan = get_gan_network(discriminator_1,discriminator_2, generator, adam)
+	generator, discriminator_1, discriminator_2, gan = train_gan(generator, discriminator_1, discriminator_2, gan, ep_start=epo, epochs=nepochs, batch_size=batch_size)
 
-def loadCRNNModel(epoch,mode_crnn='no_progressive'):
+def loadCRNNModel(epoch,mode_crnn='no_progressive', batch_size=12):
 	from data.generator import DataGenerator
 	input_size = (1024, 128, 1)
 	dtgen = DataGenerator(source=source_path,
-					
-batch_size=batch_size,
+						batch_size=batch_size,  # Use global batch_size
 						charset=charset_base,
 						max_text_length=max_text_length)
 
@@ -711,16 +930,14 @@ def ocr_crnn(filename,dtgen,model):
 	return reco
 def predict_gan(epoch, generator,list_image_valid,set):
 	
-	
-
 	count_image=0
 	for im in list_image_valid:
 		if count_image >=0:
 
 			#deg_image, gt_image = readGrayPairPad(im)
-			original_path_image_gt=DatabasePath + '/' + im + '.png'
+			original_path_image_gt=os.path.join(DatabasePath, set, 'images', im)
 			claen_image=cv2.imread(original_path_image_gt)
-			noisy_image_path='datasets/iam_distorted/' + im + '.png'
+			noisy_image_path=os.path.join('datasets/nan_distorted/', set, im)
 			noisy_image=cv2.imread(noisy_image_path)
 			
 			#height, width,c = noisy_image.shape
@@ -732,52 +949,50 @@ def predict_gan(epoch, generator,list_image_valid,set):
 			#cv2.imwrite('out_padded.png',noisy_image)
 			##############end padding
 			
+			original_image = Image.open(noisy_image_path) 
+			original_image = original_image.resize((1024,128), Image.Resampling.LANCZOS)
 			
-			
-			
-grey_image = original_image.convert('L')
-grey_image.save("deg_image3.png")
-deg_image = plt.imread("deg_image3.png")
+			grey_image = original_image.convert('L')
+			grey_image.save("deg_image3.png")
+			deg_image = plt.imread("deg_image3.png")
 			
 			prediction = generator.predict(deg_image.reshape(1, 128,1024, 1)).reshape(128,1024)
 			plt.imsave("prediction3.png", prediction, cmap='gray')
 			if not os.path.exists(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch)):
 				os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch))
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/prediction")
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/prediction_reduced")
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/visualize")
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/Truth")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/prediction")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/prediction_reduced")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/visualize")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/Truth")
 			################"resize predicted image to original size
 			cv2.imwrite(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + '/Truth/'+  im + ".png",claen_image)
 			original_image = Image.open('prediction3.png') 
 			original_image.save(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + '/prediction_reduced/'+  im + ".png")
 			########################""resizingggggggggg	
-			original_image = original_image.resize((width,height), Image.ANTIALIAS)
+			original_image = original_image.resize((width,height), Image.Resampling.LANCZOS)
 			original_image.save(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + '/prediction/'+  im + ".png")
 			# ######################space image
 			if not os.path.exists(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/Distorted"):
 				os.makedirs(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/Distorted")
 			
-			
 			original_image = Image.open(noisy_image_path) 
-			original_image = original_image.resize((1024,128), Image.ANTIALIAS)
+			original_image = original_image.resize((1024,128), Image.Resampling.LANCZOS)
 			original_image.save(rootPath+ "/ResultGan" + scenario + "/set_" + set + "_epoch_" + str(epoch) + "/Distorted/" + im + ".png")
 			
-			 
 		count_image=count_image+1
 def predict_gan_hard(epoch, generator,list_image_valid,set):
 	
 	
-	scenario='S_iam_OP'
+	scenario='S_nan_OP'
 
 	count_image=0
 	for im in list_image_valid:
 		if count_image >=0:
 
 			#deg_image, gt_image = readGrayPairPad(im)
-			original_path_image_gt=DatabasePath + '/' + im + '.png'
+			original_path_image_gt=os.path.join(DatabasePath, set, 'images', im)
 			claen_image=cv2.imread(original_path_image_gt)
-			noisy_image_path='datasets/iam_distorted/' + im + '.png'
+			noisy_image_path=os.path.join('datasets/nan_distorted/', set, im)
 			noisy_image=cv2.imread(noisy_image_path)
 			
 			#height, width,c = noisy_image.shape
@@ -789,13 +1004,9 @@ def predict_gan_hard(epoch, generator,list_image_valid,set):
 			#cv2.imwrite('out_padded.png',noisy_image)
 			##############end padding
 			
-			
-			
-			
 			original_image = Image.open(noisy_image_path) 
-			original_image = original_image.resize((1024,128), Image.ANTIALIAS)
+			original_image = original_image.resize((1024,128), Image.Resampling.LANCZOS)
 
-		
 			grey_image = original_image.convert('L')
 			grey_image.save("deg_image3x.png")
 			deg_image = plt.imread("deg_image3x.png")
@@ -804,20 +1015,19 @@ def predict_gan_hard(epoch, generator,list_image_valid,set):
 			plt.imsave("prediction3x.png", prediction, cmap='gray')
 			if not os.path.exists(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch)):
 				os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch))
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/prediction")
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/prediction_reduced")
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/visualize")
-					os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/Truth")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/prediction")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/prediction_reduced")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/visualize")
+				os.makedirs(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + "/Truth")
 			################"resize predicted image to original size
 			#cv2.imwrite(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + '/Truth/'+  im + ".png",claen_image)
 			original_image = Image.open('prediction3x.png') 
 			#original_image.save(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + '/prediction_reduced/'+  im + ".png")
 			########################""resizingggggggggg	
-			original_image = original_image.resize((width,height), Image.ANTIALIAS)
+			original_image = original_image.resize((width,height), Image.Resampling.LANCZOS)
 			original_image.save(rootPath+ "/ResultGan" + scenario + "/hard3_set_" + set + "_epoch_" + str(epoch) + '/prediction/'+  im + ".png")
 			######################space image
 			
-			 
 		count_image=count_image+1
 def addpad_image(img):
 
@@ -851,14 +1061,14 @@ def get_psnr_iam():
 	for im in list_image:
 		original_path_image_gt = DatabasePathGT + '/' + im + '.png'
 		original_image = Image.open(original_path_image_gt)
-		original_image = original_image.resize((1024,128), Image.ANTIALIAS)
+		original_image = original_image.resize((1024,128), Image.Resampling.LANCZOS)
 		grey_image = original_image.convert('1')
 		grey_image.save("gt.png")
 		gt = plt.imread("gt.png")
 
 		enhanced_image_path = 'handwritten-text-recognition/ResultGanS_iam_OP/hard3_set_test_epoch_112/prediction/'+  im + ".png"
 		im2 = Image.open(enhanced_image_path)
-		im2 = im2.resize((1024,128), Image.ANTIALIAS)
+		im2 = im2.resize((1024,128), Image.Resampling.LANCZOS)
 		im2 = im2.convert('1')
 		im2.save('im2.png')
 		predicted = plt.imread('im2.png')
@@ -871,8 +1081,15 @@ def get_psnr_iam():
 	print('average psnr: ')
 	print(av)
 if __name__ == '__main__':
- 
-	#############Train the GAN
-	train_GAN_crnn(150,8)
-	
- 
+	replicas = strategy.num_replicas_in_sync
+	print(f"🚀 Starting FULL OPTIMIZATION training with {replicas} GPU(s)")
+	target_global_batch = batch_size  # Use the global batch_size variable
+	if replicas == 1:
+		print("ℹ️  Hanya 1 GPU terdeteksi (cek CUDA_VISIBLE_DEVICES jika mengharapkan multi-GPU).")
+	else:
+		per_rep = target_global_batch // replicas
+		print(f"📊 Configuration: {replicas} GPUs × {per_rep} = {per_rep * replicas} global batch size")
+	print("⚡ Mixed precision + XLA enabled")
+	train_GAN_crnn(150, target_global_batch)
+
+

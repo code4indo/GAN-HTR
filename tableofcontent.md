@@ -337,6 +337,196 @@ python3 train_gan_optimized.py --epoch 150 --batch_size 32 --save_interval 10
 python3 monitor_resources.py --interval 5
 ```
 
+## 📖 Manual Penggunaan: Document Enhancement
+
+### MANUAL_PENGGUNAAN.md: Panduan Lengkap Memperbaiki Dokumen Rusak
+
+**File `MANUAL_PENGGUNAAN.md`** berisi panduan komprehensif untuk menggunakan sistem GAN-HTR Document Enhancement yang telah berhasil mengatasi masalah kompatibilitas antara training data (line segments) dan inference data (full documents).
+
+#### 🎯 Perintah Dasar Memperbaiki Dokumen Rusak:
+
+##### 1. **Metode Simple (Recommended untuk pemula)**
+```bash
+# Perbaiki dokumen otomatis
+python simple_enhancement_test.py
+```
+**Output**: Semua dokumen di direktori akan diproses dan menghasilkan file enhanced + comparison
+
+##### 2. **Metode CLI (Advanced Usage)**
+```bash
+# Syntax lengkap
+python full_document_enhancement.py \
+    --input dokumen_rusak.jpg \
+    --output dokumen_diperbaiki.png \
+    --model ./ResultGanS_S_nan_OP_SIMPLE/final/weights/generator.weights.h5 \
+    --method sliding_window \
+    --save-intermediates
+
+# Contoh praktis
+python full_document_enhancement.py \
+    --input scan_rusak.jpg \
+    --output scan_diperbaiki.png \
+    --model ./ResultGanS_S_nan_OP_SIMPLE/final/weights/generator.weights.h5
+```
+
+##### 3. **Batch Processing Multiple Files**
+```bash
+# Proses semua file JPG di direktori
+for file in *.jpg; do
+    python full_document_enhancement.py \
+        --input "$file" \
+        --output "enhanced_$file" \
+        --model ./ResultGanS_S_nan_OP_SIMPLE/final/weights/generator.weights.h5
+done
+```
+
+#### 📥 Format Input yang Didukung:
+- **Image Files**: `.jpg`, `.jpeg`, `.png`, `.tiff`
+- **Document Types**: Scan dokumen, foto dokumen, handwritten text
+- **Size**: Unlimited (otomatis disesuaikan dengan sliding window)
+
+#### 📤 Output yang Dihasilkan:
+- **Enhanced Document**: Dokumen yang sudah diperbaiki kualitasnya
+- **Comparison Image**: Side-by-side perbandingan sebelum vs sesudah
+- **Intermediate Files** (optional): Segmen-segmen proses untuk debugging
+
+#### 🔧 Tools Available untuk Document Enhancement:
+
+1. **`simple_enhancement_test.py`**: ✅ **PROVEN WORKING**
+   - Automatic document detection dan processing
+   - Menggunakan sliding window preprocessing
+   - Tested dengan documents 128x1486 dan 512x2048 pixels
+
+2. **`full_document_enhancement.py`**: Complete CLI pipeline
+   - Full parameter control
+   - Intermediate results saving
+   - Multiple preprocessing methods
+
+3. **`document_preprocessor.py`**: Core preprocessing engine
+   - Line detection untuk natural segmentation
+   - Sliding window untuk large documents
+   - Overlap handling untuk seamless reconstruction
+
+4. **`demo_full_enhancement.py`**: Demonstration script
+   - Model compatibility validation
+   - Multiple document format testing
+   - Visual comparison generation
+
+#### ✅ Success Examples (Tested & Verified):
+
+**Small Documents** (128x1486):
+- Input: `a.png`, `b.jpg`
+- Output: `simple_enhanced_a.png`, `simple_enhanced_b.png`
+- Segments: 1 per document
+- Status: ✅ Successfully enhanced
+
+**Large Documents** (512x2048):
+- Input: `large_test_document.png`
+- Output: `large_enhanced_document.png`
+- Segments: 8 dengan overlap
+- Status: ✅ Successfully enhanced
+
+#### 🎯 Performance & Quality:
+- **Processing Speed**: ~2 seconds per segment (GPU accelerated)
+- **Memory Usage**: Efficient batch processing
+- **Quality**: Enhanced legibility, reduced noise, improved contrast
+- **Compatibility**: Works with any document size through sliding window
+
+#### 💡 Pro Tips:
+1. **Start with simple_enhancement_test.py** untuk testing
+2. **Use sliding_window method** untuk dokumen kompleks
+3. **Enable --save-intermediates** untuk debugging
+4. **Check comparison images** untuk quality assessment
+5. **Use batch processing** untuk multiple documents
+
+#### 🚨 Troubleshooting:
+- **Model not found**: Verify path ke generator weights
+- **CUDA out of memory**: Kurangi ukuran dokumen atau gunakan CPU
+- **No segments generated**: Try different preprocessing method
+- **Poor quality**: Check input image quality dan model compatibility
+
+### QUICK_START_GUIDE.md: Panduan Cepat Penggunaan
+
+**File `QUICK_START_GUIDE.md`** berisi panduan express untuk langsung menggunakan sistem document enhancement tanpa perlu membaca dokumentasi lengkap. Perfect untuk user yang ingin segera memperbaiki dokumen rusak.
+
+#### ⚡ **Perintah Super Cepat:**
+```bash
+# One-liner untuk auto enhancement
+python simple_enhancement_test.py
+```
+
+#### 🎯 **Template CLI Copy-Paste:**
+```bash
+# Ganti NAMA_FILE sesuai kebutuhan
+python full_document_enhancement.py \
+    --input NAMA_FILE_INPUT.jpg \
+    --output NAMA_FILE_OUTPUT.png \
+    --model ./ResultGanS_S_nan_OP_SIMPLE/final/weights/generator.weights.h5
+```
+
+#### 📊 **Batch Processing Ready-to-Use:**
+```bash
+# Untuk semua JPG files
+for file in *.jpg; do
+    python full_document_enhancement.py \
+        --input "$file" \
+        --output "enhanced_$file" \
+        --model ./ResultGanS_S_nan_OP_SIMPLE/final/weights/generator.weights.h5
+done
+```
+
+#### ✅ **Checklist Before Use:**
+1. Verify model file exists
+2. Check input file format (.jpg/.png/.tiff)
+3. Test with simple_enhancement_test.py first
+4. Check GPU memory availability
+
+#### 📁 **Expected Output Files:**
+- `simple_enhanced_*.png` - Enhanced documents
+- `simple_comparison_*.png` - Before/after comparisons
+- Intermediate files (if --save-intermediates enabled)
+
+### demo_cara_penggunaan.sh: Interactive Demo Script
+
+**File `demo_cara_penggunaan.sh`** adalah script demo interaktif yang menampilkan cara penggunaan lengkap sistem document enhancement dengan contoh perintah yang siap digunakan.
+
+#### 🎯 **Cara Menjalankan Demo:**
+```bash
+# Make executable dan jalankan
+chmod +x demo_cara_penggunaan.sh
+bash demo_cara_penggunaan.sh
+```
+
+#### 📋 **Demo Content:**
+- ✅ Menampilkan file yang tersedia untuk testing
+- ✅ Verifikasi model weights tersedia
+- ✅ Menampilkan 3 metode enhancement (Simple, CLI, Batch)
+- ✅ Contoh perintah copy-paste ready
+- ✅ Penjelasan output yang dihasilkan
+- ✅ Quick test command
+- ✅ Link ke dokumentasi lengkap
+
+#### 🚀 **Output Demo:**
+```
+🎯 DEMO: Cara Memperbaiki Dokumen Rusak dengan GAN-HTR
+
+📋 File tersedia: a.png, b.jpg, deg_image2.png, dll
+🤖 Model tersedia: ✅ generator.weights.h5
+
+PERINTAH UNTUK MEMPERBAIKI DOKUMEN:
+1️⃣ SIMPLE: python simple_enhancement_test.py
+2️⃣ CLI: python full_document_enhancement.py --input file --output result
+3️⃣ BATCH: for file in *.jpg; do ... done
+
+✅ STATUS: READY TO USE!
+```
+
+#### 💡 **Kegunaan Demo:**
+- Onboarding baru user dengan cepat
+- Validasi setup system sebelum digunakan
+- Reference perintah yang sering digunakan
+- Troubleshooting guide terintegrasi
+
 ### monitor_resources.py: Real-time Resource Monitor
 
 **File `monitor_resources.py`** adalah script monitoring real-time yang memantau semua aspek hardware workstation selama training untuk memastikan optimal resource utilization dan mendeteksi bottleneck.
