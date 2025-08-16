@@ -204,6 +204,9 @@ Dataset/
 KHATT/
 DIBCO*/
 dibco*/
+training_logs/
+
+
 
 # Temporary files created during training
 *.tmp
