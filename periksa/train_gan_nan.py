@@ -259,7 +259,7 @@ def get_gan_network(discriminator_1, discriminator_2, generator, optimizer):
     out_discrimintor_1 = discriminator_1([out_generator, gan_input])
     
     # Reshape for CRNN
-    reshaped = Reshape((1024, 128, 1), input_shape=(128, 1024, 1))(out_generator)
+    reshaped = Reshape((1024, 128, 1))(out_generator)
     out_discrimintor_2 = discriminator_2(reshaped)
 
     gan = Model([gan_input], [out_discrimintor_1, out_generator, out_discrimintor_2])

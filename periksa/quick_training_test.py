@@ -75,15 +75,15 @@ def build_simple_generator():
     
     # Encoder
     x = Conv2D(32, 4, strides=2, padding='same')(inputs)
-    x = LeakyReLU(alpha=0.2)(x)
+    x = LeakyReLU(negative_slope=0.2)(x)
     
     x = Conv2D(64, 4, strides=2, padding='same')(x)
     x = BatchNormalization()(x)
-    x = LeakyReLU(alpha=0.2)(x)
+    x = LeakyReLU(negative_slope=0.2)(x)
     
     x = Conv2D(128, 4, strides=2, padding='same')(x)
     x = BatchNormalization()(x)
-    x = LeakyReLU(alpha=0.2)(x)
+    x = LeakyReLU(negative_slope=0.2)(x)
     
     # Decoder
     x = Conv2DTranspose(64, 4, strides=2, padding='same')(x)
@@ -108,15 +108,15 @@ def build_simple_discriminator():
     inputs = Input(shape=(128, 128, 1))
     
     x = Conv2D(32, 4, strides=2, padding='same')(inputs)
-    x = LeakyReLU(alpha=0.2)(x)
+    x = LeakyReLU(negative_slope=0.2)(x)
     
     x = Conv2D(64, 4, strides=2, padding='same')(x)
     x = BatchNormalization()(x)
-    x = LeakyReLU(alpha=0.2)(x)
+    x = LeakyReLU(negative_slope=0.2)(x)
     
     x = Conv2D(128, 4, strides=2, padding='same')(x)
     x = BatchNormalization()(x)
-    x = LeakyReLU(alpha=0.2)(x)
+    x = LeakyReLU(negative_slope=0.2)(x)
     
     x = Flatten()(x)
     outputs = Dense(1)(x)

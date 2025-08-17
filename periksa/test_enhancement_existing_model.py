@@ -73,35 +73,35 @@ def build_unet_generator(input_shape=(128, 128, 1)):
     
     # Encoder
     conv1 = Conv2D(64, 4, strides=2, padding='same')(inputs)
-    conv1 = LeakyReLU(alpha=0.2)(conv1)
+    conv1 = LeakyReLU(negative_slope=0.2)(conv1)
     
     conv2 = Conv2D(128, 4, strides=2, padding='same')(conv1)
     conv2 = BatchNormalization()(conv2)
-    conv2 = LeakyReLU(alpha=0.2)(conv2)
+    conv2 = LeakyReLU(negative_slope=0.2)(conv2)
     
     conv3 = Conv2D(256, 4, strides=2, padding='same')(conv2)
     conv3 = BatchNormalization()(conv3)
-    conv3 = LeakyReLU(alpha=0.2)(conv3)
+    conv3 = LeakyReLU(negative_slope=0.2)(conv3)
     
     conv4 = Conv2D(512, 4, strides=2, padding='same')(conv3)
     conv4 = BatchNormalization()(conv4)
-    conv4 = LeakyReLU(alpha=0.2)(conv4)
+    conv4 = LeakyReLU(negative_slope=0.2)(conv4)
     
     conv5 = Conv2D(512, 4, strides=2, padding='same')(conv4)
     conv5 = BatchNormalization()(conv5)
-    conv5 = LeakyReLU(alpha=0.2)(conv5)
+    conv5 = LeakyReLU(negative_slope=0.2)(conv5)
     
     conv6 = Conv2D(512, 4, strides=2, padding='same')(conv5)
     conv6 = BatchNormalization()(conv6)
-    conv6 = LeakyReLU(alpha=0.2)(conv6)
+    conv6 = LeakyReLU(negative_slope=0.2)(conv6)
     
     conv7 = Conv2D(512, 4, strides=2, padding='same')(conv6)
     conv7 = BatchNormalization()(conv7)
-    conv7 = LeakyReLU(alpha=0.2)(conv7)
+    conv7 = LeakyReLU(negative_slope=0.2)(conv7)
     
     # Bottleneck
     conv8 = Conv2D(512, 4, strides=2, padding='same')(conv7)
-    conv8 = LeakyReLU(alpha=0.2)(conv8)
+    conv8 = LeakyReLU(negative_slope=0.2)(conv8)
     
     # Decoder
     deconv1 = UpSampling2D(size=(2, 2))(conv8)

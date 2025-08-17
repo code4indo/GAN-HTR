@@ -229,7 +229,7 @@ def build_discriminator_1():
 	def d_layer(layer_input, filters, f_size=4, bn=True):
 # 		 """Discriminator layer"""
 		d = Conv2D(filters, kernel_size=f_size, strides=2, padding='same')(layer_input)
-		d = LeakyReLU(alpha=0.2)(d)
+		d = LeakyReLU(negative_slope=0.2)(d)
 		if bn:
 			d = BatchNormalization(momentum=0.8)(d)
 		return d
@@ -363,7 +363,7 @@ def get_gan_network(discriminator_1,discriminator_2, generator, optimizer):
 	out_discrimintor_1 = discriminator_1([out_generator, gan_input])    ### remove the gan input 3 from here 
 	######################Here we should reshape out_generator to be fed to the RCNN model
 	###################### The RCNN accept shape (1024,128,1)
-	reshaped = Reshape((1024,128,1 ), input_shape=(128,1024,1))(out_generator)
+	reshaped = Reshape((1024,128,1))(out_generator)
 
 	out_discrimintor_2= discriminator_2([reshaped])    ### remove the gan input 3 from here : CRNN Recognizer
 	# define composite model

@@ -114,16 +114,16 @@ class ImprovedGANHTR:
         
         # FIXED: Smaller discriminator untuk prevent generator collapse
         x = layers.Conv2D(32, 4, strides=2, padding='same')(inputs)  # Reduced from 64
-        x = layers.LeakyReLU(alpha=0.2)(x)
+        x = layers.LeakyReLU(negative_slope=0.2)(x)
         
         x = layers.Conv2D(64, 4, strides=2, padding='same')(x)  # Reduced from 128
         x = layers.BatchNormalization()(x)
-        x = layers.LeakyReLU(alpha=0.2)(x)
+        x = layers.LeakyReLU(negative_slope=0.2)(x)
         x = layers.Dropout(0.3)(x)
         
         x = layers.Conv2D(128, 4, strides=2, padding='same')(x)  # Reduced from 256
         x = layers.BatchNormalization()(x)
-        x = layers.LeakyReLU(alpha=0.2)(x)
+        x = layers.LeakyReLU(negative_slope=0.2)(x)
         x = layers.Dropout(0.3)(x)
         
         x = layers.Flatten()(x)

@@ -1,0 +1,36 @@
+{
+  "learning_rates": {
+    "generator": 1e-05,
+    "discriminator_1": 1e-05,
+    "discriminator_2_crnn": 1e-05
+  },
+  "batch_sizes": {
+    "training": 1,
+    "validation": 1,
+    "max_recommended": 2
+  },
+  "gradient_clipping": {
+    "norm_threshold": 0.1,
+    "crnn_threshold": 0.05
+  },
+  "loss_weights": {
+    "adversarial": 0.5,
+    "content": 1.0,
+    "recognition_crnn": 0.5
+  },
+  "early_stopping": {
+    "patience": 5,
+    "min_delta": 0.1,
+    "monitor": "val_g_loss"
+  },
+  "data_fixes": {
+    "max_text_length": 20,
+    "max_samples_per_epoch": 100,
+    "image_size": [
+      128,
+      1024,
+      1
+    ],
+    "normalize_method": "zero_one"
+  }
+}

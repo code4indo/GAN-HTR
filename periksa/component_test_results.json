@@ -1,0 +1,18 @@
+{
+  "timestamp": "2025-08-17 07:36:06",
+  "total_tests": 9,
+  "passed": 8,
+  "failed": 1,
+  "success_rate": 88.88888888888889,
+  "detailed_results": {
+    "Imports": true,
+    "Dataset Paths": true,
+    "Character Encoding": false,
+    "Data Loading": true,
+    "Model Creation": true,
+    "Forward Pass": true,
+    "CTC Loss": true,
+    "Memory Usage": true,
+    "Complete Pipeline": true
+  }
+}

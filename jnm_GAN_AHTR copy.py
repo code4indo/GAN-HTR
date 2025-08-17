@@ -225,7 +225,7 @@ def build_discriminator_1():
 	def d_layer(layer_input, filters, f_size=4, bn=True):
 # 		 """Discriminator layer"""
 		d = Conv2D(filters, kernel_size=f_size, strides=2, padding='same')(layer_input)
-		d = LeakyReLU(alpha=0.2)(d)
+		d = LeakyReLU(negative_slope=0.2)(d)
 		if bn:
 			d = BatchNormalization(momentum=0.8)(d)
 		return d
@@ -358,7 +358,7 @@ def get_gan_network(discriminator_1,discriminator_2, generator, optimizer):
 	out_discrimintor_1 = discriminator_1([out_generator, gan_input])    ### remove the gan input 3 from here 
 	######################Here we should reshape out_generator to be fed to the RCNN model
 	###################### The RCNN accept shape (1024,128,1)
-	reshaped = Reshape((1024,128,1 ), input_shape=(128,1024,1))(out_generator)
+	reshaped = Reshape((1024,128,1))(out_generator)
 
 	out_discrimintor_2= discriminator_2([reshaped])    ### remove the gan input 3 from here : CRNN Recognizer
 	# define composite model
@@ -865,34 +865,93 @@ def psnr(img1, img2):
     return (20 * math.log10(PIXEL_MAX / math.sqrt(mse)))
 
 def get_psnr_iam():
-	DatabasePathGT = 'handwritten-text-recognition/ResultsSauvegarde/ResultGanS2_W0p5/set_test_epoch_92/Truth/'
-
-	count_image = 1
-	qo = 0
-	recap = 0
-	list_image= read_file(rootPath + 'Sets/list_test_iam.txt')
-	for im in list_image:
-		original_path_image_gt = DatabasePathGT + '/' + im + '.png'
-		original_image = Image.open(original_path_image_gt)
-		original_image = original_image.resize((1024,128), Image.Resampling.LANCZOS)
-		grey_image = original_image.convert('1')
-		grey_image.save("gt.png")
-		gt = plt.imread("gt.png")
-
-		enhanced_image_path = 'handwritten-text-recognition/ResultGanS_iam_OP/hard3_set_test_epoch_112/prediction/'+  im + ".png"
-		im2 = Image.open(enhanced_image_path)
-		im2 = im2.resize((1024,128), Image.Resampling.LANCZOS)
-		im2 = im2.convert('1')
-		im2.save('im2.png')
-		predicted = plt.imread('im2.png')
-
-		psnrv = psnr(predicted, gt)
-		print(psnrv)
-		recap = recap + psnrv
-		qo += 1
-	av = recap / qo
-	print('average psnr: ')
-	print(av)
+	"""
+	Fungsi PSNR yang diperbaiki untuk dataset NAN
+	Menggunakan path yang fleksibel dan struktur database yang benar
+	"""
+	print("🔍 Calculating PSNR for NAN dataset...")
+	
+	# Path yang diperbaiki untuk dataset NAN
+	list_image = read_file(rootPath + 'Sets/list_test_nan.txt')
+	
+	# Cari enhanced images di direktori hasil training
+	enhanced_base_path = None
+	scenario_dir = rootPath + "ResultGan" + scenario
+	
+	if os.path.exists(scenario_dir):
+		# Cari epoch terakhir
+		epochs = [d for d in os.listdir(scenario_dir) if d.startswith('epoch')]
+		if epochs:
+			latest_epoch = max(epochs, key=lambda x: int(x.replace('epoch', '')))
+			enhanced_base_path = os.path.join(scenario_dir, latest_epoch)
+			print(f"📁 Using enhanced images from: {enhanced_base_path}")
+	
+	if not enhanced_base_path or not os.path.exists(enhanced_base_path):
+		print("❌ Enhanced images directory not found!")
+		return
+	
+	count_image = 0
+	total_psnr = 0
+	processed = 0
+	
+	for im in list_image[:50]:  # Limit untuk testing
+		try:
+			# Ground truth image path - cari di berbagai split
+			gt_image_path = None
+			for split in ['test', 'validation', 'train']:
+				potential_gt_path = f'datasets/nan_raw_biner/{split}/images/'
+				if os.path.exists(potential_gt_path):
+					for ext in ['.jpg', '.png']:
+						test_path = os.path.join(potential_gt_path, im + ext)
+						if os.path.exists(test_path):
+							gt_image_path = test_path
+							break
+					if gt_image_path:
+						break
+			
+			if not gt_image_path:
+				print(f"⚠️  GT image not found: {im}")
+				continue
+			
+			# Enhanced image path 
+			enhanced_filename = im + ".jpg.png"
+			enhanced_image_path = os.path.join(enhanced_base_path, enhanced_filename)
+			
+			if not os.path.exists(enhanced_image_path):
+				print(f"⚠️  Enhanced image not found: {enhanced_filename}")
+				continue
+			
+			# Load and process images
+			original_image = Image.open(gt_image_path)
+			original_image = original_image.resize((1024, 128), Image.Resampling.LANCZOS)
+			grey_image = original_image.convert('L')
+			gt = np.array(grey_image) / 255.0
+			
+			enhanced_image = Image.open(enhanced_image_path)
+			enhanced_image = enhanced_image.resize((1024, 128), Image.Resampling.LANCZOS)
+			enhanced_image = enhanced_image.convert('L')
+			predicted = np.array(enhanced_image) / 255.0
+			
+			# Calculate PSNR
+			psnrv = psnr(predicted, gt)
+			print(f"📊 Image {processed+1}: {im[:50]}... PSNR: {psnrv:.2f}")
+			
+			total_psnr += psnrv
+			processed += 1
+			
+		except Exception as e:
+			print(f"❌ Error processing {im}: {e}")
+			continue
+	
+	if processed > 0:
+		average_psnr = total_psnr / processed
+		print(f"\n📈 Results Summary:")
+		print(f"   Total images processed: {processed}/{len(list_image)}")
+		print(f"   Average PSNR: {average_psnr:.2f} dB")
+		return average_psnr
+	else:
+		print("❌ No images could be processed!")
+		return None
 if __name__ == '__main__':
  
 	#############Train the GAN

@@ -332,7 +332,7 @@ def build_discriminator_1():
 	def d_layer(layer_input, filters, f_size=4, bn=True):
 		# 		 """Discriminator layer"""
 		d = Conv2D(filters, kernel_size=f_size, strides=2, padding='same')(layer_input)
-		d = LeakyReLU(alpha=0.2)(d)
+		d = LeakyReLU(negative_slope=0.2)(d)
 		if bn:
 			d = BatchNormalization(momentum=0.8)(d)
 			d.trainable=False
