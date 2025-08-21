@@ -205,6 +205,7 @@ KHATT/
 DIBCO*/
 dibco*/
 training_logs/
+wandb/
 
 
 

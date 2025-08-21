@@ -1,96 +1,143 @@
 #!/usr/bin/env python3
 """
-Indentation fixer untuk jnm_GAN_AHTR.py
-Script ini akan memperbaiki masalah indentasi secara otomatis
+Script to detect and fix indentation issues in Python files
 """
 
-def fix_indentation():
-    """Fix indentation issues in jnm_GAN_AHTR.py"""
+import os
+import sys
+import re
+from pathlib import Path
+
+def detect_indentation_issues(file_path):
+    """
+    Detect indentation issues in a Python file
+    """
+    issues = []
     
-    input_file = 'jnm_GAN_AHTR.py'
-    output_file = 'jnm_GAN_AHTR_fixed.py'
-    
-    print(f"Fixing indentation in {input_file}...")
-    
-    with open(input_file, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-    
-    fixed_lines = []
-    in_function = False
-    function_indent = 0
-    
-    for i, line in enumerate(lines):
-        line_num = i + 1
-        original_line = line
-        
-        # Check if this is a function definition
-        stripped = line.strip()
-        
-        if stripped.startswith('def ') and ':' in stripped:
-            in_function = True
-            function_indent = len(line) - len(line.lstrip())
-            fixed_lines.append(line)
-            continue
-        
-        # Special fixes for known problematic lines
-        if line_num == 318:  # grey_image.save line
-            fixed_lines.append('\tgrey_image.save("deg_image2.png")\n')
-            continue
-        elif line_num == 319:  # deg_image = plt.imread line
-            fixed_lines.append('\tdeg_image = plt.imread("deg_image2.png")\n')
-            continue
-        elif line_num == 321:  # gt_image_path line
-            fixed_lines.append('\tgt_image_path = os.path.join(DatabasePath, split, "images", im_name)\n')
-            continue
-        elif line_num == 322:  # original_image = Image.open line
-            fixed_lines.append('\toriginal_image = Image.open(gt_image_path)\n')
-            continue
-        
-        # Handle lines that are clearly inside functions but have wrong indentation
-        if in_function and stripped:
-            if not stripped.startswith('def ') and not stripped.startswith('class '):
-                # If line has content but wrong indentation, fix it
-                if line.startswith('\t') or line.startswith('    '):
-                    # Already indented, keep as is
-                    fixed_lines.append(line)
-                elif not line.startswith(' ') and stripped:
-                    # No indentation but should be indented
-                    fixed_lines.append('\t' + stripped + '\n')
-                else:
-                    fixed_lines.append(line)
-            else:
-                # New function definition
-                in_function = True
-                function_indent = len(line) - len(line.lstrip())
-                fixed_lines.append(line)
-        else:
-            fixed_lines.append(line)
-        
-        # Check if we're leaving a function
-        if in_function and stripped and not line.startswith(' ') and not line.startswith('\t'):
-            if not stripped.startswith('def ') and not stripped.startswith('class '):
-                in_function = False
-    
-    # Write fixed file
-    with open(output_file, 'w', encoding='utf-8') as f:
-        f.writelines(fixed_lines)
-    
-    print(f"Fixed file saved as {output_file}")
-    
-    # Test compilation
     try:
-        import py_compile
-        py_compile.compile(output_file, doraise=True)
-        print("✅ Fixed file compiles successfully!")
+        with open(file_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
         
-        # Replace original file
-        import shutil
-        shutil.copy(output_file, input_file)
-        print(f"✅ Original file {input_file} updated")
+        for i, line in enumerate(lines, 1):
+            # Skip empty lines and comments
+            stripped = line.strip()
+            if not stripped or stripped.startswith('#'):
+                continue
+            
+            # Check for mixed tabs and spaces
+            if '\t' in line and ' ' in line[:len(line) - len(line.lstrip())]:
+                issues.append(f"Line {i}: Mixed tabs and spaces")
+            
+            # Check for unexpected indentation
+            if line.startswith(' ') or line.startswith('\t'):
+                # This is an indented line - check if it should be
+                prev_line_idx = i - 2
+                while prev_line_idx >= 0:
+                    prev_line = lines[prev_line_idx].strip()
+                    if prev_line:
+                        break
+                    prev_line_idx -= 1
+                
+                if prev_line_idx >= 0:
+                    prev_line = lines[prev_line_idx]
+                    # Check if previous line ends with colon or backslash
+                    if not (prev_line.rstrip().endswith(':') or 
+                           prev_line.rstrip().endswith('\\') or
+                           prev_line.strip().endswith('(') or
+                           '(' in prev_line and ')' not in prev_line):
+                        # Check if this line is a continuation of a previous construct
+                        if not any(keyword in stripped for keyword in ['def ', 'class ', 'if ', 'elif ', 'else:', 'for ', 'while ', 'try:', 'except', 'finally:', 'with ']):
+                            issues.append(f"Line {i}: Possibly unexpected indentation: '{stripped[:50]}...'")
+    
+    except Exception as e:
+        issues.append(f"Error reading file: {e}")
+    
+    return issues
+
+def fix_indentation_issue_at_line(file_path, line_number):
+    """
+    Fix indentation issue at a specific line
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
         
-    except py_compile.PyCompileError as e:
-        print(f"❌ Compilation error: {e}")
-        print("Manual fixes may be needed")
+        if line_number <= len(lines):
+            target_line = lines[line_number - 1]
+            
+            # Remove leading whitespace and add proper indentation
+            stripped_line = target_line.lstrip()
+            
+            # Determine proper indentation based on context
+            proper_indent = ""
+            
+            # Look at previous non-empty line for context
+            prev_line_idx = line_number - 2
+            while prev_line_idx >= 0:
+                prev_line = lines[prev_line_idx]
+                if prev_line.strip():
+                    # Count indentation of previous line
+                    prev_indent = len(prev_line) - len(prev_line.lstrip())
+                    
+                    # If previous line ends with colon, increase indent
+                    if prev_line.rstrip().endswith(':'):
+                        proper_indent = " " * (prev_indent + 4)
+                    else:
+                        proper_indent = " " * prev_indent
+                    break
+                prev_line_idx -= 1
+            
+            # Apply the fix
+            lines[line_number - 1] = proper_indent + stripped_line
+            
+            # Write back to file
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.writelines(lines)
+            
+            print(f"✅ Fixed indentation at line {line_number}")
+            return True
+            
+    except Exception as e:
+        print(f"❌ Error fixing line {line_number}: {e}")
+        return False
+
+def main():
+    """Main function to check and fix indentation"""
+    
+    # Check network/model.py specifically
+    model_file = Path("network/model.py")
+    
+    if not model_file.exists():
+        print(f"❌ File not found: {model_file}")
+        return
+    
+    print(f"🔍 Checking indentation in {model_file}...")
+    
+    issues = detect_indentation_issues(model_file)
+    
+    if issues:
+        print(f"📋 Found {len(issues)} potential issues:")
+        for issue in issues:
+            print(f"   {issue}")
+        
+        # Try to fix the specific issue at line 480
+        print(f"\n🔧 Attempting to fix line 480...")
+        if fix_indentation_issue_at_line(model_file, 480):
+            print("✅ Fix applied successfully")
+        else:
+            print("❌ Could not apply automatic fix")
+            
+        # Recheck after fix
+        print(f"\n🔍 Rechecking after fix...")
+        new_issues = detect_indentation_issues(model_file)
+        if new_issues:
+            print(f"⚠️ {len(new_issues)} issues remain:")
+            for issue in new_issues:
+                print(f"   {issue}")
+        else:
+            print("✅ All indentation issues resolved!")
+    else:
+        print("✅ No indentation issues found")
 
 if __name__ == "__main__":
-    fix_indentation()
+    main()
