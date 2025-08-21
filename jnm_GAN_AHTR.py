@@ -13,6 +13,7 @@ os.environ['TF_GPU_ALLOCATOR'] = 'cuda_malloc_async'
 
 # Configure TensorFlow threading BEFORE importing TensorFlow
 import tensorflow as tf
+tf.keras.backend.clear_session()
 
 # Suppress TensorFlow logging and NUMA warnings
 tf.get_logger().setLevel('ERROR')
@@ -102,14 +103,6 @@ class UltraSafeCTCLossLocal:
         if not tf.reduce_all(tf.math.is_finite(y_pred)):
             # If the model outputs NaN/Inf, it's a critical error. Return a high, stable loss value.
             return tf.constant(self.fallback_loss, dtype=tf.float32)
-
-        # 3. Heuristically check if y_pred contains probabilities (from softmax) instead of logits.
-        # tf.nn.ctc_loss expects logits. Passing probabilities can cause numerical errors (log(0)).
-        # This is a common mistake. We check if all values are in [0, 1].
-        is_likely_probs = tf.reduce_all(y_pred >= 0.0) and tf.reduce_all(y_pred <= 1.0)
-        if is_likely_probs:
-            # Convert probabilities to logits. Add a small epsilon to prevent log(0) = -inf.
-            y_pred = tf.math.log(y_pred + K.epsilon())
 
         # 4. Calculate input and label lengths for CTC.
         batch_size = tf.shape(y_pred)[0]
